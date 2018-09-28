@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image } from 'react-native';
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
 
@@ -21,12 +21,14 @@ export default class App extends React.Component {
       loginOrSignup: "login",
       currentPage: "Reminders",
       babysitterEmail: "",
-      errMsg: ""
+      errMsg: "",
+      showSideMenu: false
     };
 
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
     this.changeAccountType = this.changeAccountType.bind(this);
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
+    this.showSideMenu = this.showSideMenu.bind(this);
   };
 
   componentDidMount() {
@@ -77,6 +79,10 @@ export default class App extends React.Component {
     this.setState({loginOrSignup});
   };
 
+  showSideMenu() {
+    this.setState({showSideMenu: true});
+  };
+
   render() {
     let user = this.state.user;
 
@@ -92,8 +98,22 @@ export default class App extends React.Component {
         }
         {
           user &&
-          <View>
+          <View style={{flex: 1}}>
             {/* <SideMenu /> */}
+
+            <View style={{height: 55}}>
+              <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
+                <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
+              </TouchableOpacity>
+
+              <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20}}>
+                Babysitter/Family
+              </Text>
+
+              <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
+                <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require('./assets/antMenuIcon.png')} />
+              </TouchableOpacity>
+            </View>
     
             <View>
               <View>
@@ -103,7 +123,7 @@ export default class App extends React.Component {
                 <Text>REMINDERS</Text>
               </View>
               <View>
-                <Text>ROUTINE</Text>
+                <Text>BABY INFO</Text>
               </View>
             </View>
     

@@ -22,7 +22,8 @@ export default class App extends React.Component {
       currentPage: "Reminders",
       babysitterEmail: "",
       errMsg: "",
-      showSideMenu: false
+      showSideMenu: false,
+      oppositeUsers: undefined
     };
 
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
@@ -35,6 +36,21 @@ export default class App extends React.Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({user});
+
+        firestore.collection("parentUsers").doc(user.uid).collection("babysitters").get().then((doc) => {
+          let ar = [];
+          doc.forEach(function(doc2) {
+            ar.push({id: doc2.id, email: doc2.data().email});
+            console.log(doc2.id)
+          })
+          console.log(ar)
+
+          this.setState({oppositeUsers: ar}) 
+
+      }).catch(function(error) {
+          console.log("Error getting document:", error);
+      });
+      
       }
     });
   };
@@ -57,7 +73,7 @@ export default class App extends React.Component {
       if (providers.length === 0) {
         this.setState({errMsg: "No Such BabySitter Found!"});
       } else {
-        firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babySitters").doc("test").update({
+        firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.babysitterEmail).update({
           "messages": {},
           "reminders": {},
           "babyInfo": {}
@@ -96,6 +112,7 @@ export default class App extends React.Component {
           !user && this.state.accountType !== "" &&
             <LoginSignupPage backToChooseAccountType={this.backToChooseAccountType} accountType={this.state.accountType} loginOrSignup={this.state.loginOrSignup} setLoginOrSignup={this.setLoginOrSignup} />
         }
+
         {
           user &&
           <View style={{flex: 1}}>
@@ -103,7 +120,7 @@ export default class App extends React.Component {
 
             <View style={{height: 55}}>
               <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
-                <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
+                  <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
               </TouchableOpacity>
 
               <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20}}>
@@ -114,43 +131,66 @@ export default class App extends React.Component {
                 <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require('./assets/antMenuIcon.png')} />
               </TouchableOpacity>
             </View>
-    
-            <View>
-              <View>
-                <Text>MESSAGES</Text>
-              </View>
-              <View>
-                <Text>REMINDERS</Text>
-              </View>
-              <View>
-                <Text>BABY INFO</Text>
-              </View>
-            </View>
-    
-            <View>
-              {
-                this.state.currentPage === "Messages" &&
-                  <Messages user={user} />
-              }
-              {
-                this.state.currentPage === "Reminders" &&
-                  <Reminders user={user} />
-              }
-              {
-                this.state.currentPage === "Routine" &&
-                  <Routine user={user} />
-              }
-            </View>
-    
-            <View style={{height: 70, zIndex: 1}}>
-              <Text>this is the main page</Text>
-              <Button title="Sign Out" onPress={this.signOut.bind(this)} />
-              <Text style={{zIndex: 1}}>add BabySitter Email</Text>
-              <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
-              <Button styles={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
-            </View>
+
+            { !this.state.oppositeUsers &&
             
+              <View>
+                <View>
+                  <Text>To start, please add a Babysitter</Text>
+
+                  <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
+                  <Button styles={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
+                </View>
+              </View>
+
+            }
+
+            { this.state.oppositeUsers &&
+    
+              <View>
+                <View>
+                  <View>
+                    <Text>MESSAGES</Text>
+                  </View>
+                  <View>
+                    <Text>REMINDERS</Text>
+                  </View>
+                  <View>
+                    <Text>BABY INFO</Text>
+                  </View>
+                </View>
+        
+                <View>
+                  {
+                    this.state.currentPage === "Messages" &&
+                      <Messages user={user} />
+                  }
+                  {
+                    this.state.currentPage === "Reminders" &&
+                      <Reminders user={user} />
+                  }
+                  {
+                    this.state.currentPage === "Routine" &&
+                      <Routine user={user} />
+                  }
+                </View>
+        
+                <View style={{zIndex: 1}}>
+                  <Text>this is the main page</Text>
+
+                  <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
+                  <Button styles={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
+                  <Text style={{zIndex: 1}}>add BabySitter Email</Text>
+                  
+                </View>
+            
+              </View>
+            }
+
+            <Button title="Sign Out" onPress={this.signOut.bind(this)} />
+
           </View>
+
         }
       </View>
     );

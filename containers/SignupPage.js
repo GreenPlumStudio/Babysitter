@@ -32,22 +32,26 @@ export default class LoginPage extends Component {
             return;
         }
 
+        console.log(this.state.accountType);
+
         firebase.auth().createUserWithEmailAndPassword(this.state.emailAddress, this.state.password)
             .then(() => {
-                let type = "";
-                let type1 = "";
-                if (this.state.accountType === "Parent") {
-                    type = "parentUsers";
-                    type1 = "babySitters";
-                } else {
-                    type = "babySitterUsers";
+                var user = firebase.auth().currentUser;
+                let type = "parentUsers";
+                let type1 = "babysitters";
+                if (this.state.accountType !== "parent") {
+                    type = "babysitterUsers";
                     type1 = "parents";
                 }
-                firestore.collection(type).doc(firebase.auth().currentUser.uid).set({
+                firestore.collection(type).doc(user.uid).set({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
                     username: this.state.username,
-                    type1: {}
+                    email: this.state.emailAddress
+                });
+
+                firestore.collection(type).doc(user.uid).collection(type1).doc("test").set({
+                    test: ""
                 });
             })
             .catch(err => {

@@ -5,10 +5,11 @@ import { Constants } from 'expo';
 
 import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
-import Routine from './containers/Routine';
+import BabyInfo from './containers/BabyInfo';
 import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './components/LoginSignupPage';
-import SideMenu from './containers/SideMenu';
+import NavBar from './components/NavBar';
+// import SideMenu from './containers/SideMenu';
 
 export default class App extends React.Component {
   constructor() {
@@ -19,7 +20,7 @@ export default class App extends React.Component {
       loading: true,
       accountType: "",
       loginOrSignup: "login",
-      currentPage: "Reminders",
+      currentPage: "messages",
       babysitterEmail: "",
       errMsg: "",
       showSideMenu: false
@@ -29,6 +30,7 @@ export default class App extends React.Component {
     this.changeAccountType = this.changeAccountType.bind(this);
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
     this.showSideMenu = this.showSideMenu.bind(this);
+    this.changeCurrentPage = this.changeCurrentPage.bind(this);
   };
 
   componentDidMount() {
@@ -83,6 +85,10 @@ export default class App extends React.Component {
     this.setState({showSideMenu: true});
   };
 
+  changeCurrentPage(newCurrentPage) {
+    this.setState({currentPage: newCurrentPage});
+  };
+
   render() {
     let user = this.state.user;
 
@@ -99,10 +105,10 @@ export default class App extends React.Component {
         {
           user &&
           <View style={{flex: 1}}>
-            {/* <SideMenu /> */}
+            {/* <SideMenu showSideMenu={this.state.showSideMenu} /> */}
 
             <View style={{height: 55}}>
-              <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
+              <TouchableOpacity style={{position: "absolute", top: 15}} /*onPress={this.showSideMenu}*/>
                 <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
               </TouchableOpacity>
 
@@ -114,31 +120,21 @@ export default class App extends React.Component {
                 <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require('./assets/antMenuIcon.png')} />
               </TouchableOpacity>
             </View>
-    
-            <View>
-              <View>
-                <Text>MESSAGES</Text>
-              </View>
-              <View>
-                <Text>REMINDERS</Text>
-              </View>
-              <View>
-                <Text>BABY INFO</Text>
-              </View>
-            </View>
+
+            <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
     
             <View>
               {
-                this.state.currentPage === "Messages" &&
+                this.state.currentPage === "messages" &&
                   <Messages user={user} />
               }
               {
-                this.state.currentPage === "Reminders" &&
+                this.state.currentPage === "reminders" &&
                   <Reminders user={user} />
               }
               {
-                this.state.currentPage === "Routine" &&
-                  <Routine user={user} />
+                this.state.currentPage === "babyInfo" &&
+                  <BabyInfo user={user} />
               }
             </View>
     
@@ -158,28 +154,5 @@ export default class App extends React.Component {
 };
 
 const styles = StyleSheet.create({
-  mainPage: {
-    flex: 1
-  },
 
-  navBar: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    width: Dimensions.get("window").width
-  },
-
-  navButton: {
-    padding: 2,
-    borderBottomWidth: 2,
-    borderBottomColor: "#89CFF0",
-    width: Dimensions.get("window").width / 3
-  },
-
-  navButtonLabel: {
-    color: "#89CFF0",
-    fontWeight: "bold",
-    textAlign: "center",
-    textAlignVertical: "bottom"
-  }
 });

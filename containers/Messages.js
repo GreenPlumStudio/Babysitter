@@ -14,6 +14,7 @@ export default class Messages extends Component {
         return (
             <View>
                 <Text>This be the fking messages page ya betch lol</Text>
+                <Text>pls dont do cocaine ey cocaine ruin your brain ey</Text>
             </View>
         );
     };

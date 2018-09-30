@@ -1,7 +1,7 @@
 import React, {Component} from 'React';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default class Routine extends Component {
+export default class BabyInfo extends Component {
     constructor(props) {
         super(props);
 
@@ -13,7 +13,8 @@ export default class Routine extends Component {
     render() {
         return (
             <View>
-                <Text>This be the fking routine page ya betch lol</Text>
+                <Text>This be the fking babyInfo page ya betch lol</Text>
+                <Text>pls dont do cocaine ey cocaine ruin your brain ey</Text>
             </View>
         );
     };

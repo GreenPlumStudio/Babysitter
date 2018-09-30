@@ -5,10 +5,11 @@ import { Constants } from 'expo';
 
 import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
-import Routine from './containers/Routine';
+import BabyInfo from './containers/BabyInfo';
 import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './components/LoginSignupPage';
-import SideMenu from './containers/SideMenu';
+import NavBar from './components/NavBar';
+// import SideMenu from './containers/SideMenu';
 
 export default class App extends React.Component {
   constructor() {
@@ -19,7 +20,7 @@ export default class App extends React.Component {
       loading: true,
       accountType: "",
       loginOrSignup: "login",
-      currentPage: "Reminders",
+      currentPage: "messages",
       babysitterEmail: "",
       errMsg: "",
       showSideMenu: false,
@@ -30,6 +31,7 @@ export default class App extends React.Component {
     this.changeAccountType = this.changeAccountType.bind(this);
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
     this.showSideMenu = this.showSideMenu.bind(this);
+    this.changeCurrentPage = this.changeCurrentPage.bind(this);
   };
 
   componentDidMount() {
@@ -40,19 +42,25 @@ export default class App extends React.Component {
         firestore.collection("parentUsers").doc(user.uid).collection("babysitters").get().then((doc) => {
           let ar = [];
           doc.forEach(function(doc2) {
-            ar.push({id: doc2.id, email: doc2.data().email});
-            console.log(doc2.id)
+            if (doc2.id != "test") {
+              ar.push({id: doc2.id, email: doc2.data().email});
+              console.log(doc2.id)
+            }
           })
           console.log(ar)
 
-          this.setState({oppositeUsers: ar}) 
+          if (ar.length >= 1) {
+            this.setState({oppositeUsers: ar}) 
+          }
 
+          console.log(this.state.oppositeUsers);
       }).catch(function(error) {
           console.log("Error getting document:", error);
       });
       
       }
     });
+
   };
 
   changeAccountType(accountType) {
@@ -99,6 +107,10 @@ export default class App extends React.Component {
     this.setState({showSideMenu: true});
   };
 
+  changeCurrentPage(newCurrentPage) {
+    this.setState({currentPage: newCurrentPage});
+  };
+
   render() {
     let user = this.state.user;
 
@@ -116,7 +128,7 @@ export default class App extends React.Component {
         {
           user &&
           <View style={{flex: 1}}>
-            {/* <SideMenu /> */}
+            {/* <SideMenu showSideMenu={this.state.showSideMenu} /> */}
 
             <View style={{height: 55}}>
               <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
@@ -146,19 +158,26 @@ export default class App extends React.Component {
             }
 
             { this.state.oppositeUsers &&
+            <View>
+            <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
+    
+            <View>
+              {
+                this.state.currentPage === "messages" &&
+                  <Messages user={user} />
+              }
+              {
+                this.state.currentPage === "reminders" &&
+                  <Reminders user={user} />
+              }
+              {
+                this.state.currentPage === "babyInfo" &&
+                  <BabyInfo user={user} />
+              }
+            </View>
     
               <View>
-                <View>
-                  <View>
-                    <Text>MESSAGES</Text>
-                  </View>
-                  <View>
-                    <Text>REMINDERS</Text>
-                  </View>
-                  <View>
-                    <Text>BABY INFO</Text>
-                  </View>
-                </View>
+                
         
                 <View>
                   {
@@ -185,12 +204,14 @@ export default class App extends React.Component {
                 </View>
             
               </View>
+              </View>
             }
 
             <Button title="Sign Out" onPress={this.signOut.bind(this)} />
 
           </View>
 
+           
         }
       </View>
     );
@@ -198,28 +219,5 @@ export default class App extends React.Component {
 };
 
 const styles = StyleSheet.create({
-  mainPage: {
-    flex: 1
-  },
 
-  navBar: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    width: Dimensions.get("window").width
-  },
-
-  navButton: {
-    padding: 2,
-    borderBottomWidth: 2,
-    borderBottomColor: "#89CFF0",
-    width: Dimensions.get("window").width / 3
-  },
-
-  navButtonLabel: {
-    color: "#89CFF0",
-    fontWeight: "bold",
-    textAlign: "center",
-    textAlignVertical: "bottom"
-  }
 });

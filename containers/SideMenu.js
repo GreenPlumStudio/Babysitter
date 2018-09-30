@@ -1,21 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Dimensions, Animated, Easing, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Animated, Easing, TouchableOpacity } from 'react-native';
 
 const SideMenuItems = () => {
-    <View>
-		<Text>Open up App.js to start working on your app!</Text>
-		<Text>Changes you make will automatically reload.</Text>
-		<Text>Shake your phone to open the developer menu.</Text>
-	</View>
+    return (
+        <View>
+            <Text>Open up App.js to start working on your app!</Text>
+            <Text>Changes you make will automatically reload.</Text>
+            <Text>Shake your phone to open the developer menu.</Text>
+        </View>
+    );
 };
 
 export default class SideMenu extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             percent: new Animated.Value(0),
-            grayout: false
+            grayout: false,
+            showSideMenu: props.showSideMenu
         };
 
         this.showSideMenu = this.showSideMenu.bind(this);
@@ -51,10 +54,10 @@ export default class SideMenu extends React.Component {
     };
     
     render() {
+        if (this.state.showSideMenu) this.showSideMenu();
+
         return (
             <View style={styles.sideMenu}>
-				<Button title="SHOW" onPress={this.showSideMenu} />
-
 				<Animated.View style={{
                     backgroundColor: 'red',
                     width: this.halfWidth,

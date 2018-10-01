@@ -5,6 +5,8 @@ import LoginPage from '../containers/LoginPage';
 import SignupPage from '../containers/SignupPage';
 
 const LoginSignupPage = (props) => {
+    let loginOrSignup = props.loginOrSignup;
+
     return (
         <View style={styles.loginSignupPage}>
             <TouchableOpacity style={styles.backButton} onPress={props.backToChooseAccountType}>
@@ -12,15 +14,15 @@ const LoginSignupPage = (props) => {
             </TouchableOpacity>
 
             {
-                props.loginOrSignup === "login" &&
+                loginOrSignup === "login" &&
                     <LoginPage accountType={props.accountType} />
             }
             {
-                props.loginOrSignup === "signup" &&
+                loginOrSignup === "signup" &&
                     <SignupPage accountType={props.accountType} />
             }
             
-            <Button title="Don't have an account? Sign up here" onPress={() => props.setLoginOrSignup(props.loginOrSignup === "login" ? "signup" : "login")} />
+            <Button title={loginOrSignup === "login" ? "Don't have an account? Sign up here" : "Already have an account? Log in here"} onPress={() => props.setLoginOrSignup(props.loginOrSignup === "login" ? "signup" : "login")} />
         </View>
     );
 };

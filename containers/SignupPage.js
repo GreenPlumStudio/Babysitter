@@ -1,7 +1,7 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View, Button, TextInput, Dimensions, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity } from 'react-native';
 import { firebase, firestore } from '../utils/firebase';
-import { Constants } from 'expo';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default class LoginPage extends Component {
     constructor(props) {
@@ -36,11 +36,11 @@ export default class LoginPage extends Component {
             .then(() => {
                 let type = "";
                 let type1 = "";
-                if (this.state.accountType === "Parent") {
+                if (this.state.accountType === "parent") {
                     type = "parentUsers";
-                    type1 = "babySitters";
+                    type1 = "babysitters";
                 } else {
-                    type = "babySitterUsers";
+                    type = "babysitterUsers";
                     type1 = "parents";
                 }
                 firestore.collection(type).doc(firebase.auth().currentUser.uid).set({
@@ -73,7 +73,7 @@ export default class LoginPage extends Component {
         };
 
         return (
-            <KeyboardAvoidingView style={styles.signupPage} behavior="padding" enabled>
+            <KeyboardAwareScrollView contentContainerStyle={styles.signupPage}>
                 <Text style={formTitle}>{(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}</Text>
 
                 <View style={styles.signupForm}>
@@ -95,7 +95,7 @@ export default class LoginPage extends Component {
                 <TouchableOpacity style={styles.signupButton} onPress={this.trySignup.bind(this)}>
                     <Text style={styles.signupButtonText}>SIGN UP</Text>
                 </TouchableOpacity>
-            </KeyboardAvoidingView>
+            </KeyboardAwareScrollView>
         );
     };
 };

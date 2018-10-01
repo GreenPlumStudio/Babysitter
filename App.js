@@ -24,7 +24,7 @@ export default class App extends React.Component {
       babysitterEmail: "",
       errMsg: "",
       showSideMenu: false,
-      oppositeUsers: undefined
+      oppositeUsers: []
     };
 
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
@@ -144,74 +144,43 @@ export default class App extends React.Component {
               </TouchableOpacity>
             </View>
 
-            { !this.state.oppositeUsers &&
-            
+            {
+              !this.state.oppositeUsers &&
               <View>
                 <View>
                   <Text>To start, please add a Babysitter</Text>
 
                   <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
-                  <Button styles={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
+                  <Button style={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
                 </View>
               </View>
-
             }
 
-            { this.state.oppositeUsers &&
-            <View>
-            <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
-    
-            <View>
-              {
-                this.state.currentPage === "messages" &&
-                  <Messages user={user} />
-              }
-              {
-                this.state.currentPage === "reminders" &&
-                  <Reminders user={user} />
-              }
-              {
-                this.state.currentPage === "babyInfo" &&
-                  <BabyInfo user={user} />
-              }
-            </View>
-    
-              <View>
-                
+            {
+              this.state.oppositeUsers &&
+              <View style={{flex: 1}}>
+                <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
         
                 <View>
                   {
-                    this.state.currentPage === "Messages" &&
+                    this.state.currentPage === "messages" &&
                       <Messages user={user} />
                   }
                   {
-                    this.state.currentPage === "Reminders" &&
+                    this.state.currentPage === "reminders" &&
                       <Reminders user={user} />
                   }
                   {
-                    this.state.currentPage === "Routine" &&
-                      <Routine user={user} />
+                    this.state.currentPage === "babyInfo" &&
+                      <BabyInfo user={user} />
                   }
                 </View>
-        
-                <View style={{zIndex: 1}}>
-                  <Text>this is the main page</Text>
-
-                  <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
-                  <Button styles={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
-                  <Text style={{zIndex: 1}}>add BabySitter Email</Text>
-                  
-                </View>
-            
-              </View>
               </View>
             }
 
             <Button title="Sign Out" onPress={this.signOut.bind(this)} />
 
           </View>
-
-           
         }
       </View>
     );

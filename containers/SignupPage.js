@@ -1,7 +1,6 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View, Button, TextInput, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import { firebase, firestore } from '../utils/firebase';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default class LoginPage extends Component {
     constructor(props) {
@@ -16,7 +15,8 @@ export default class LoginPage extends Component {
             emailAddress: "",
             password: "",
             confirmPassword: "",
-            errMsg: ""
+            errMsg: "",
+            isFormFocused: false
         };
 
         this.onFormFocus = this.onFormFocus.bind(this);
@@ -61,11 +61,11 @@ export default class LoginPage extends Component {
     };
 
     onFormFocus() {
-        this.setState({formTitleSize: 15});
+        this.setState({formTitleSize: 15, isFormFocused: true});
     };
 
     onFormEndEditing() {
-        this.setState({formTitleSize: 30});
+        this.setState({formTitleSize: 30, isFormFocused: false});
     };
 
     render() {
@@ -73,14 +73,16 @@ export default class LoginPage extends Component {
             fontSize: this.state.formTitleSize,
             fontWeight: "500",
             color: "dodgerblue",
-            elevation: 2
+            elevation: 2,
+            marginTop: 25,
+            marginBottom: 20
         };
 
         return (
-            <KeyboardAwareScrollView contentContainerStyle={styles.signupPage}>
+            <View style={styles.signupPage}>
                 <Text style={formTitle}>{(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}</Text>
 
-                <View style={styles.signupForm}>
+                <ScrollView>
                     <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="First Name" textContentType="givenName" value={this.state.firstName} onChangeText={text => this.setState({firstName: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
 
                     <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Last Name" textContentType="familyName" value={this.state.lastName} onChangeText={text => this.setState({lastName: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
@@ -92,14 +94,14 @@ export default class LoginPage extends Component {
                     <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
                     
                     <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Confirm Password" textContentType="password" secureTextEntry={true} value={this.state.confirmPassword} onChangeText={text => this.setState({confirmPassword: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
-                </View>
+                </ScrollView>
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>
 
-                <TouchableOpacity style={styles.signupButton} onPress={this.trySignup.bind(this)}>
+                <TouchableOpacity style={this.state.isFormFocused ? styles.signupButtonOnFormFocus : styles.signupButton} onPress={this.trySignup.bind(this)}>
                     <Text style={styles.signupButtonText}>SIGN UP</Text>
                 </TouchableOpacity>
-            </KeyboardAwareScrollView>
+            </View>
         );
     };
 };
@@ -112,30 +114,36 @@ const styles = StyleSheet.create({
         backgroundColor: "lightblue"
     },
 
-    signupForm: {
-        flex: 1,
-        justifyContent: "space-between"
-    },
-
     formInput: {
         backgroundColor: "white",
         width: 0.85 * Dimensions.get("window").width,
         padding: 20,
         fontSize: 20,
         borderRadius: 2,
-        elevation: 2
+        elevation: 2,
+        marginBottom: 10
     },
 
     errMsg: {
         fontSize: 15,
         color: "red",
-        textAlign: "center"
+        textAlign: "center",
+        margin: 5
     },
 
     signupButton: {
         backgroundColor: "#2196F3",
         borderRadius: 2,
-        elevation: 4
+        elevation: 4,
+        margin: 5
+    },
+
+    signupButtonOnFormFocus: {
+        backgroundColor: "#2196F3",
+        borderRadius: 2,
+        elevation: 4,
+        margin: 5,
+        marginTop: Dimensions.get("window").height * 0.3
     },
 
     signupButtonText: {

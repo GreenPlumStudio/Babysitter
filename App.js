@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, /* SideMenu */ Animated, Easing } from 'react-native';
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
 
@@ -10,6 +10,16 @@ import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './components/LoginSignupPage';
 import NavBar from './components/NavBar';
 // import SideMenu from './containers/SideMenu';
+
+const SideMenuItems = () => {
+  return (
+      <View>
+          <Text>Open up App.js to start working on your app!</Text>
+          <Text>Changes you make will automatically reload.</Text>
+          <Text>Shake your phone to open the developer menu.</Text>
+      </View>
+  );
+};
 
 export default class App extends React.Component {
   constructor() {
@@ -23,8 +33,11 @@ export default class App extends React.Component {
       currentPage: "messages",
       babysitterEmail: "",
       errMsg: "",
-      showSideMenu: false,
-      oppositeUsers: []
+      oppositeUsers: [],
+
+      // SideMenu
+      percent: new Animated.Value(0),
+      grayout: false
     };
 
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
@@ -32,6 +45,10 @@ export default class App extends React.Component {
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
     this.showSideMenu = this.showSideMenu.bind(this);
     this.changeCurrentPage = this.changeCurrentPage.bind(this);
+
+    // SideMenu
+    this.showSideMenu = this.showSideMenu.bind(this);
+    this.hideSideMenu = this.hideSideMenu.bind(this);
   };
 
   componentDidMount() {
@@ -61,6 +78,12 @@ export default class App extends React.Component {
       }
     });
 
+    // SideMenu
+    this.halfWidth = Dimensions.get('window').width * 0.5;
+
+    // setTimeout(()=>{
+    //   this.showSideMenu();
+    // }, 1000);
   };
 
   changeAccountType(accountType) {
@@ -103,9 +126,31 @@ export default class App extends React.Component {
     this.setState({loginOrSignup});
   };
 
+  /* SideMenu~ */
   showSideMenu() {
-    this.setState({showSideMenu: true});
+    Animated.timing(this.state.percent, {
+      toValue: 1,
+      duration: 130,
+      easing: Easing.ease
+    }).start();
+
+		this.setState({
+			grayout: true
+    });
   };
+
+  hideSideMenu() {
+		Animated.timing(this.state.percent, {
+			toValue: 0,
+			duration: 130,
+			easing: Easing.ease
+		}).start();
+
+		this.setState({
+			grayout: false
+		});
+  };
+  /* ~Side Menu */
 
   changeCurrentPage(newCurrentPage) {
     this.setState({currentPage: newCurrentPage});
@@ -113,7 +158,7 @@ export default class App extends React.Component {
 
   render() {
     let user = this.state.user;
-
+    
     return (
       <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
         {
@@ -129,10 +174,48 @@ export default class App extends React.Component {
           user &&
           <View style={{flex: 1}}>
             {/* <SideMenu showSideMenu={this.state.showSideMenu} /> */}
+            
+            {/* Side Menu~ */}
+            <Animated.View style={{
+              backgroundColor: 'red',
+              width: this.halfWidth * 1.4,
+              height: Dimensions.get('window').height,
+              position: 'absolute',
+              left: -this.halfWidth * 1.4,
+              top: 0,
+              zIndex: 3,
+              transform: [
+                {
+                  translateX: this.state.percent.interpolate({
+                    inputRange: [ 0, 1 ],
+                    outputRange: [ 0, this.halfWidth * 1.4 ]
+                  })
+                }
+              ]
+            }}>
+              <SideMenuItems />
+            </Animated.View>
 
-            <View style={{height: 55}}>
+            {
+              this.state.grayout &&
+                <TouchableOpacity style={{
+                    backgroundColor: 'gray',
+                    width: this.halfWidth * 2,
+                    height: Dimensions.get('window').height,
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    zIndex: 2,
+                    opacity: 0.4
+                  }}
+                  onPress={this.hideSideMenu}
+                />
+            }
+            {/* ~Side Menu */}
+
+            <View style={{height: 55 /*, position: "absolute", top: 0, left: 0*/}}>
               <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
-                  <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
+                <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
               </TouchableOpacity>
 
               <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20}}>
@@ -188,5 +271,16 @@ export default class App extends React.Component {
 };
 
 const styles = StyleSheet.create({
-
+  // SideMenu
+  sideMenu: {
+		flex: 1,
+		alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: 100,
+    height: 100
+	}
 });

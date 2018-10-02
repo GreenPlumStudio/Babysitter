@@ -28,10 +28,10 @@ export default class Reminders extends Component {
 
     render() {
         return (
-            <View styles={{zIndex: 1}}>
+            <View>
                 <Text>This be the fking reminders page ya betch lol</Text>
                 <Text>hey</Text>
-                <Button styles={{zIndex: 1}} title="Add a Reminder" onPress={() => {this.popupDialog.show();}} />
+                <Button title="Add a Reminder" onPress={() => {this.popupDialog.show();}} />
                 <PopupDialog
                     haveOverlay={true}
                     overlayBackgroundColor={'green'}
@@ -39,9 +39,8 @@ export default class Reminders extends Component {
                     dialogAnimation={scaleAnimation}
                     ref={(popupDialog) => { this.popupDialog = popupDialog; }}
                     dialogTitle={<DialogTitle title="Add Reminder" />}
-
                 >
-                    <View style={{zIndex:3}}>
+                    <View style={{zIndex:1}}>
                         <ReminderModal addReminder={(text) => this.addReminder(text)}/>
                     </View>
                 </PopupDialog>

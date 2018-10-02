@@ -17,7 +17,7 @@ export default class App extends React.Component {
 
     this.state = {
       user: undefined,
-      loading: true,
+      // loading: true,
       accountType: "",
       loginOrSignup: "login",
       currentPage: "messages",
@@ -30,10 +30,10 @@ export default class App extends React.Component {
       grayout: false
     };
 
-    this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
     this.changeAccountType = this.changeAccountType.bind(this);
+    this.signOut = this.signOut.bind(this);
+    this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
-    this.showSideMenu = this.showSideMenu.bind(this);
     this.changeCurrentPage = this.changeCurrentPage.bind(this);
 
     // SideMenu
@@ -69,7 +69,7 @@ export default class App extends React.Component {
     });
 
     // SideMenu
-    this.halfWidth = Dimensions.get('window').width * 0.5;
+    this.halfWidth = Dimensions.get("window").width * 0.5;
 
     // setTimeout(()=>{
     //   this.showSideMenu();
@@ -82,7 +82,14 @@ export default class App extends React.Component {
 
   signOut() {
     firebase.auth().signOut().then(() => {
-      this.setState({user: undefined, accountType: "", loginOrSignup: "login"});
+      this.setState({
+        user: undefined,
+        accountType: "",
+        loginOrSignup: "login",
+        currentPage: "messages",
+        percent: new Animated.Value(0),
+        grayout: false
+      });
     }).catch(() => {
       alert("Sign out failed, please try again");
     });
@@ -163,14 +170,12 @@ export default class App extends React.Component {
         {
           user &&
           <View style={{flex: 1}}>
-            {/* <SideMenu showSideMenu={this.state.showSideMenu} /> */}
-            
             {/* Side Menu~ */}
             <Animated.View style={{
-              backgroundColor: 'red',
+              backgroundColor: "white",
               width: this.halfWidth * 1.4,
-              height: Dimensions.get('window').height,
-              position: 'absolute',
+              height: Dimensions.get("window").height,
+              position: "absolute",
               left: -this.halfWidth * 1.4,
               top: 0,
               zIndex: 3,
@@ -183,16 +188,16 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems />
+              <SideMenuItems signOut={this.signOut} />
             </Animated.View>
 
             {
               this.state.grayout &&
                 <TouchableOpacity style={{
-                    backgroundColor: 'gray',
+                    backgroundColor: "gray",
                     width: this.halfWidth * 2,
-                    height: Dimensions.get('window').height,
-                    position: 'absolute',
+                    height: Dimensions.get("window").height,
+                    position: "absolute",
                     left: 0,
                     top: 0,
                     zIndex: 2,
@@ -203,7 +208,7 @@ export default class App extends React.Component {
             }
             {/* ~Side Menu */}
 
-            <View style={{height: 55 /*, position: "absolute", top: 0, left: 0*/}}>
+            <View style={{height: 55, backgroundColor: "white", zIndex: 0}}>
               <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
                 <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
               </TouchableOpacity>
@@ -231,7 +236,7 @@ export default class App extends React.Component {
 
             {
               this.state.oppositeUsers &&
-              <View style={{flex: 1}}>
+              <View style={{flex: 1, zIndex: 0}}>
                 <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
         
                 <View>
@@ -250,9 +255,6 @@ export default class App extends React.Component {
                 </View>
               </View>
             }
-
-            <Button title="Sign Out" onPress={this.signOut.bind(this)} />
-
           </View>
         }
       </View>
@@ -261,16 +263,5 @@ export default class App extends React.Component {
 };
 
 const styles = StyleSheet.create({
-  // SideMenu
-  sideMenu: {
-		flex: 1,
-		alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: 100,
-    height: 100
-	}
+
 });

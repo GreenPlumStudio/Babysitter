@@ -34,7 +34,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: Dimensions.get("window").width,
         maxHeight: 30,
-        marginBottom: 5
+        marginBottom: 5,
+        elevation: 3,
+        backgroundColor: "white",
+        zIndex: 0
     },
   
     navButton: {

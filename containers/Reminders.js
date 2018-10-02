@@ -33,7 +33,6 @@ export default class Reminders extends Component {
                 <Text>hey</Text>
                 <Button title="Add a Reminder" onPress={() => {this.popupDialog.show();}} />
                 <PopupDialog
-                    haveOverlay={true}
                     overlayBackgroundColor={'green'}
                     height={0.6}
                     dialogAnimation={scaleAnimation}

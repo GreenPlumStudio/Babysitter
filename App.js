@@ -9,17 +9,7 @@ import BabyInfo from './containers/BabyInfo';
 import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './components/LoginSignupPage';
 import NavBar from './components/NavBar';
-// import SideMenu from './containers/SideMenu';
-
-const SideMenuItems = () => {
-  return (
-      <View>
-          <Text>Open up App.js to start working on your app!</Text>
-          <Text>Changes you make will automatically reload.</Text>
-          <Text>Shake your phone to open the developer menu.</Text>
-      </View>
-  );
-};
+import SideMenuItems from './components/SideMenuItems';
 
 export default class App extends React.Component {
   constructor() {

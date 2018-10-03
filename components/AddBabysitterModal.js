@@ -17,7 +17,7 @@ export default class AddBabysitterModal extends Component {
             <View >
                 <Text>Add a Babysitter</Text>
                 <TextInput value={this.state.text} onChangeText={a => this.setState({text: a})}/>
-                <Button title="Add Babysitter" onPress={() => {this.props.addReminder(this.state.text)}}/>
+                <Button title="Add Babysitter" onPress={() => {this.props.addBabysitter(this.state.text)}}/>
             </View>
         );
     }

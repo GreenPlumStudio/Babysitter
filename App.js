@@ -36,9 +36,10 @@ export default class App extends React.Component {
       accountType: "",
       loginOrSignup: "login",
       currentPage: "messages",
-      babysitterEmail: "",
+      babysitterUid: "",
       errMsg: "",
       oppositeUsers: [],
+      oppositeUser: "",
 
       addReminder: false,
 
@@ -61,6 +62,7 @@ export default class App extends React.Component {
     this.hideSideMenu = this.hideSideMenu.bind(this);
     this.addBabysitter = this.addBabysitter.bind(this);
   };
+
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -133,28 +135,44 @@ export default class App extends React.Component {
   }
 
 
-  addBabysitter() {
-    firebase.auth().fetchProvidersForEmail(this.state.babysitterEmail)
-    .then(providers => {
-      if (providers.length === 0) {
-        this.setState({errMsg: "No Such BabySitter Found!"});
-      } else {
-        firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.babysitterEmail).update({
-          "messages": {},
-          "reminders": {},
-          "babyInfo": {}
-      });
-      this.setState({errMsg: providers});
+  addBabysitter(babyUid) {
 
-      firestore.collection("babysitterUsers").doc(firebase.auth().currentUser.uid).collection("parents").doc(this.state.user.uid).update({
-        name: this.state.user.email,
+    this.setState({babysitterUid: babyUid});
+    console.log(babyUid)
+    console.log(this.state.user.uid);
+
+    firestore.collection("babysitterUsers").get().then(function(querySnapshot) {
+      let ret = false;
+
+      querySnapshot.forEach(function(doc) {
+          if (doc.id == babyUid) {
+            ret = true;
+          }
+
+          
       });
 
+      if (!ret) {
+        this.setState({errMsg: "babyUid does not Exist"});
+        return;
       }
-    }).catch(() => {
-      alert("Adding babysitter failed");
     });
     
+    firestore.collection("parentUsers").doc(this.state.user.uid).collection("babysitters").doc(babyUid).set({
+      "messages": {},
+      "reminders": {},
+      "babyInfo": {}
+    });
+
+    firestore.collection("babysitterUsers").doc(babyUid).collection("parents").doc(this.state.user.uid).set({
+      name: this.state.user.email
+    });
+
+    firestore.collection("babysitterUsers").get().doc(babyUid).then(function(querySnapshot) {
+      
+    });
+
+    this.setState({oppositeUser: babyUid})
   }
   
   backToChooseAccountType() {
@@ -270,7 +288,7 @@ export default class App extends React.Component {
                 <View>
                   <Text>To start, please add a Babysitter</Text>
 
-                  <TextInput style={{zIndex: 1}} value={this.state.babysitterEmail} onChangeText={text => this.setState({babysitterEmail: text})}/>
+                  <TextInput style={{zIndex: 1}} value={this.state.babysitterUid} onChangeText={text => this.setState({babysitterUid: text})}/>
                   <Button style={{zIndex: 1}} title="Add Babysitter" onPress={this.addBabysitter} />
                 </View>
               </View>

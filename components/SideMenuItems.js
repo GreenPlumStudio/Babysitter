@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
+
+
+
 const SideMenuItems = (props) => {
     return (
         <View style={{flex: 1, alignItems: "center"}}>
@@ -11,6 +14,12 @@ const SideMenuItems = (props) => {
             <TouchableOpacity style={styles.button} onPress={props.signOut}>
                 <Text style={styles.buttonText}>
                     SIGN OUT
+                </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.button} onPress={props.openPopupDialog}>
+                <Text style={styles.buttonText}>
+                    Add a Babysitter
                 </Text>
             </TouchableOpacity>
         </View>

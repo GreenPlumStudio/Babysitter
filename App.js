@@ -11,6 +11,21 @@ import LoginSignupPage from './components/LoginSignupPage';
 import NavBar from './components/NavBar';
 import SideMenuItems from './components/SideMenuItems';
 
+import ReminderModal from './components/ReminderModal';
+import PopupDialog, { ScaleAnimation, DialogButton, DialogTitle} from 'react-native-popup-dialog';
+import AddBabysitterModal from './components/AddBabysitterModal';
+
+
+const addBabysitterPopup = new ScaleAnimation({
+  toValue: 0, // optional
+  useNativeDriver: true, // optional
+})
+
+const addReminderPopup = new ScaleAnimation({
+  toValue: 0, // optional
+  useNativeDriver: true, // optional
+})
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -25,6 +40,8 @@ export default class App extends React.Component {
       errMsg: "",
       oppositeUsers: [],
 
+      addReminder: false,
+
       // SideMenu
       percent: new Animated.Value(0),
       grayout: false
@@ -35,10 +52,14 @@ export default class App extends React.Component {
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
     this.setLoginOrSignup = this.setLoginOrSignup.bind(this);
     this.changeCurrentPage = this.changeCurrentPage.bind(this);
+    this.openAddBabysitterPopup = this.openAddBabysitterPopup.bind(this);
+    this.openAddReminderPopup = this.openAddReminderPopup.bind(this);
+    this.addReminder = this.addReminder.bind(this);
 
     // SideMenu
     this.showSideMenu = this.showSideMenu.bind(this);
     this.hideSideMenu = this.hideSideMenu.bind(this);
+    this.addBabysitter = this.addBabysitter.bind(this);
   };
 
   componentDidMount() {
@@ -95,6 +116,23 @@ export default class App extends React.Component {
     });
   };
 
+  openAddBabysitterPopup() {
+    this.addBabysitterPopupDialog.show();
+  }
+
+  openAddReminderPopup() {
+    this.addReminderPopupDialog.show();
+  }
+
+  addReminder(text) {
+    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).set({
+        "reminderTest": text
+    });
+
+    console.log(text);
+  }
+
+
   addBabysitter() {
     firebase.auth().fetchProvidersForEmail(this.state.babysitterEmail)
     .then(providers => {
@@ -107,6 +145,10 @@ export default class App extends React.Component {
           "babyInfo": {}
       });
       this.setState({errMsg: providers});
+
+      firestore.collection("babysitterUsers").doc(firebase.auth().currentUser.uid).collection("parents").doc(this.state.user.uid).update({
+        name: this.state.user.email,
+      });
 
       }
     }).catch(() => {
@@ -188,7 +230,7 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems signOut={this.signOut} />
+              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} />
             </Animated.View>
 
             {
@@ -246,7 +288,7 @@ export default class App extends React.Component {
                   }
                   {
                     this.state.currentPage === "reminders" &&
-                      <Reminders user={user} />
+                      <Reminders user={user} popupDialog={this.openAddReminderPopup} />
                   }
                   {
                     this.state.currentPage === "babyInfo" &&
@@ -255,6 +297,31 @@ export default class App extends React.Component {
                 </View>
               </View>
             }
+
+            <PopupDialog
+                    overlayBackgroundColor={'green'}
+                    height={0.6}
+                    dialogAnimation={addBabysitterPopup}
+                    ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
+                    dialogTitle={<DialogTitle title="Add a Babysitter" />}
+            >
+                    <View style={{zIndex:1}}>
+                        <AddBabysitterModal addBabysitter = {(text) => this.addBabysitter(text)} />
+                    </View>
+            </PopupDialog>
+
+            <PopupDialog
+                    overlayBackgroundColor={'green'}
+                    height={0.6}
+                    dialogAnimation={addReminderPopup}
+                    ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}
+                    dialogTitle={<DialogTitle title="Add Reminder" />}
+            >
+                    <View style={{zIndex:1}}>
+                        <ReminderModal addReminder={(text) => this.addReminder(text)}/>
+                    </View>
+              </PopupDialog>
+
           </View>
         }
       </View>

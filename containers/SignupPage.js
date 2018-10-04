@@ -8,19 +8,14 @@ export default class LoginPage extends Component {
 
         this.state = {
             accountType: props.accountType,
-            formTitleSize: 30,
             firstName: "",
             lastName: "",
             username: "",
             emailAddress: "",
             password: "",
             confirmPassword: "",
-            errMsg: "",
-            isFormFocused: false
+            errMsg: ""
         };
-
-        this.onFormFocus = this.onFormFocus.bind(this);
-        this.onFormEndEditing = this.onFormEndEditing.bind(this);
     };
 
     trySignup() {
@@ -60,45 +55,30 @@ export default class LoginPage extends Component {
             });
     };
 
-    onFormFocus() {
-        this.setState({formTitleSize: 15, isFormFocused: true});
-    };
-
-    onFormEndEditing() {
-        this.setState({formTitleSize: 30, isFormFocused: false});
-    };
-
     render() {
-        let formTitle = {
-            fontSize: this.state.formTitleSize,
-            fontWeight: "500",
-            color: "dodgerblue",
-            elevation: 2,
-            marginTop: 25,
-            marginBottom: 20
-        };
-
         return (
             <View style={styles.signupPage}>
-                <Text style={formTitle}>{(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}</Text>
+                <Text style={this.props.isFormFocused ? styles.formTitleOnFormFocus : styles.formTitle}>
+                    {(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}
+                </Text>
 
                 <ScrollView>
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="First Name" textContentType="givenName" value={this.state.firstName} onChangeText={text => this.setState({firstName: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="First Name" textContentType="givenName" value={this.state.firstName} onChangeText={text => this.setState({firstName: text})} />
 
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Last Name" textContentType="familyName" value={this.state.lastName} onChangeText={text => this.setState({lastName: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Last Name" textContentType="familyName" value={this.state.lastName} onChangeText={text => this.setState({lastName: text})} />
                     
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Username" textContentType="username" value={this.state.username} onChangeText={text => this.setState({username: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Username" textContentType="username" value={this.state.username} onChangeText={text => this.setState({username: text})} />
                     
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
                     
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
                     
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Confirm Password" textContentType="password" secureTextEntry={true} value={this.state.confirmPassword} onChangeText={text => this.setState({confirmPassword: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Confirm Password" textContentType="password" secureTextEntry={true} value={this.state.confirmPassword} onChangeText={text => this.setState({confirmPassword: text})} />
                 </ScrollView>
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>
 
-                <TouchableOpacity style={this.state.isFormFocused ? styles.signupButtonOnFormFocus : styles.signupButton} onPress={this.trySignup.bind(this)}>
+                <TouchableOpacity style={this.props.isFormFocused ? styles.signupButtonOnFormFocus : styles.signupButton} onPress={this.trySignup.bind(this)}>
                     <Text style={styles.signupButtonText}>SIGN UP</Text>
                 </TouchableOpacity>
             </View>
@@ -112,6 +92,24 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         alignItems: "center",
         backgroundColor: "lightblue"
+    },
+
+    formTitle: {
+        fontSize: 30,
+        fontWeight: "500",
+        color: "dodgerblue",
+        elevation: 2,
+        marginTop: 25,
+        marginBottom: 20
+    },
+
+    formTitleOnFormFocus: {
+        fontSize: 15,
+        fontWeight: "500",
+        color: "dodgerblue",
+        elevation: 2,
+        marginTop: 25,
+        marginBottom: 20
     },
 
     formInput: {

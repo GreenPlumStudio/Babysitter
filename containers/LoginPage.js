@@ -8,14 +8,10 @@ export default class LoginPage extends Component {
 
         this.state = {
             accountType: props.accountType,
-            formTitleSize: 30,
             emailAddress: "",
             password: "",
             errMsg: ""
         };
-
-        this.onFormFocus = this.onFormFocus.bind(this);
-        this.onFormEndEditing = this.onFormEndEditing.bind(this);
     };
 
     tryLogin() {
@@ -28,30 +24,17 @@ export default class LoginPage extends Component {
             });
     };
 
-    onFormFocus() {
-        this.setState({formTitleSize: 15});
-    };
-
-    onFormEndEditing() {
-        this.setState({formTitleSize: 30});
-    };
-
     render() {
-        let formTitle = {
-            fontSize: this.state.formTitleSize,
-            fontWeight: "500",
-            color: "dodgerblue",
-            elevation: 2
-        };
-
         return (
             <KeyboardAvoidingView style={styles.loginPage} behavior="padding" enabled>
-                <Text style={formTitle}>{(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Log In"}</Text>
+                <Text style={this.props.isFormFocused ? styles.formTitleOnFormFocus : styles.formTitle}>
+                    {(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Log In"}
+                </Text>
 
                 <View style={styles.loginForm}>
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
                     
-                    <TextInput style={styles.formInput} underlineColorAndroid="transparent" placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} onFocus={this.onFormFocus} onEndEditing={this.onFormEndEditing} />
+                    <TextInput style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
                 </View>
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>
@@ -72,6 +55,24 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         alignItems: "center",
         backgroundColor: "lightblue"
+    },
+
+    formTitle: {
+        fontSize: 30,
+        fontWeight: "500",
+        color: "dodgerblue",
+        elevation: 2,
+        marginTop: 25,
+        marginBottom: 20
+    },
+
+    formTitleOnFormFocus: {
+        fontSize: 15,
+        fontWeight: "500",
+        color: "dodgerblue",
+        elevation: 2,
+        marginTop: 25,
+        marginBottom: 20
     },
 
     loginForm: {

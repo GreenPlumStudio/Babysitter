@@ -7,7 +7,7 @@ import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
 import BabyInfo from './containers/BabyInfo';
 import WelcomePage from './components/WelcomePage';
-import LoginSignupPage from './components/LoginSignupPage';
+import LoginSignupPage from './containers/LoginSignupPage';
 import NavBar from './components/NavBar';
 import SideMenuItems from './components/SideMenuItems';
 
@@ -62,7 +62,6 @@ export default class App extends React.Component {
     this.hideSideMenu = this.hideSideMenu.bind(this);
     this.addBabysitter = this.addBabysitter.bind(this);
   };
-
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -317,28 +316,28 @@ export default class App extends React.Component {
             }
 
             <PopupDialog
-                    overlayBackgroundColor={'green'}
-                    height={0.6}
-                    dialogAnimation={addBabysitterPopup}
-                    ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
-                    dialogTitle={<DialogTitle title="Add a Babysitter" />}
+              overlayBackgroundColor={'green'}
+              height={0.6}
+              dialogAnimation={addBabysitterPopup}
+              ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
+              dialogTitle={<DialogTitle title="Add a Babysitter" />}
             >
-                    <View style={{zIndex:1}}>
-                        <AddBabysitterModal addBabysitter = {(text) => this.addBabysitter(text)} />
-                    </View>
+              <View style={{zIndex:1}}>
+                <AddBabysitterModal addBabysitter = {(text) => this.addBabysitter(text)} />
+              </View>
             </PopupDialog>
 
             <PopupDialog
-                    overlayBackgroundColor={'green'}
-                    height={0.6}
-                    dialogAnimation={addReminderPopup}
-                    ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}
-                    dialogTitle={<DialogTitle title="Add Reminder" />}
+              overlayBackgroundColor={'green'}
+              height={0.6}
+              dialogAnimation={addReminderPopup}
+              ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}
+              dialogTitle={<DialogTitle title="Add Reminder" />}
             >
-                    <View style={{zIndex:1}}>
-                        <ReminderModal addReminder={(text) => this.addReminder(text)}/>
-                    </View>
-              </PopupDialog>
+              <View style={{zIndex:1}}>
+                <ReminderModal addReminder={(text) => this.addReminder(text)}/>
+              </View>
+            </PopupDialog>
 
           </View>
         }

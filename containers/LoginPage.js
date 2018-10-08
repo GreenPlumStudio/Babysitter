@@ -12,6 +12,8 @@ export default class LoginPage extends Component {
             password: "",
             errMsg: ""
         };
+
+        this.tryLogin = this.tryLogin.bind(this);
     };
 
     tryLogin() {
@@ -39,7 +41,7 @@ export default class LoginPage extends Component {
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>
 
-                <TouchableOpacity style={styles.loginButton} onPress={this.tryLogin.bind(this)}>
+                <TouchableOpacity style={styles.loginButton} onPress={this.tryLogin}>
                     <Text style={styles.loginButtonText}>LOG IN</Text>
                 </TouchableOpacity>
 

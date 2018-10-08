@@ -7,7 +7,6 @@ export default class LoginPage extends Component {
         super(props);
 
         this.state = {
-            accountType: props.accountType,
             firstName: "",
             lastName: "",
             username: "",
@@ -16,6 +15,8 @@ export default class LoginPage extends Component {
             confirmPassword: "",
             errMsg: ""
         };
+
+        this.trySignup = this.trySignup.bind(this);
     };
 
     trySignup() {
@@ -27,26 +28,21 @@ export default class LoginPage extends Component {
             return;
         }
 
-        console.log(this.state.accountType);
-
         firebase.auth().createUserWithEmailAndPassword(this.state.emailAddress, this.state.password)
             .then(() => {
-                var user = firebase.auth().currentUser;
-                let type = "parentUsers";
-                let type1 = "babysitters";
-                if (this.state.accountType !== "parent") {
-                    type = "babysitterUsers";
-                    type1 = "parents";
-                }
-                firestore.collection(type).doc(user.uid).set({
+                let user = firebase.auth().currentUser;
+                let colType = this.props.accountType + "Users";
+                let oppositeColType = this.props.accountType === "parent" ? "babysitters" : "parents";
+
+                firestore.collection(colType).doc(user.uid).set({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
                     username: this.state.username,
                     email: this.state.emailAddress
                 });
 
-                firestore.collection(type).doc(user.uid).collection(type1).doc("test").set({
-                    test: ""
+                firestore.collection(colType).doc(user.uid).collection(oppositeColType).doc("placeholder").set({
+                    placeholder: "placeholder"
                 });
             })
             .catch(err => {
@@ -59,7 +55,7 @@ export default class LoginPage extends Component {
         return (
             <View style={styles.signupPage}>
                 <Text style={this.props.isFormFocused ? styles.formTitleOnFormFocus : styles.formTitle}>
-                    {(this.state.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}
+                    {(this.props.accountType === "parent" ? "Parent" : "Babysitter") + " Sign Up"}
                 </Text>
 
                 <ScrollView>
@@ -78,7 +74,7 @@ export default class LoginPage extends Component {
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>
 
-                <TouchableOpacity style={this.props.isFormFocused ? styles.signupButtonOnFormFocus : styles.signupButton} onPress={this.trySignup.bind(this)}>
+                <TouchableOpacity style={this.props.isFormFocused ? styles.signupButtonOnFormFocus : styles.signupButton} onPress={this.trySignup}>
                     <Text style={styles.signupButtonText}>SIGN UP</Text>
                 </TouchableOpacity>
             </View>

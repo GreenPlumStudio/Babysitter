@@ -34,7 +34,7 @@ export default class Reminders extends Component {
         console.log(i);
         console.log(this.state.reminders)
 
-        this.props.DeleteReminder(this.state.reminders);
+        this.props.deleteReminder(this.state.reminders);
     }
 
     render() {

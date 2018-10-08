@@ -1,15 +1,16 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-
-
-
+import { StyleSheet, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 
 const SideMenuItems = (props) => {
     return (
-        <View style={{flex: 1, alignItems: "center"}}>
-            <Text>Open up App.js to start working on your app!</Text>
-            <Text>Changes you make will automatically reload.</Text>
-            <Text>Shake your phone to open the developer menu.</Text>
+        <ScrollView contentContainerStyle={{flex: 1, alignItems: "center", padding: 10}}>
+            <TouchableOpacity>
+                <Image style={styles.userIcon} resizeMode="center" source={require('../assets/defaultUserIcon.png')} />
+            </TouchableOpacity>
+
+            <Text>{props.user.firstName} {props.user.lastName}</Text>
+
+            <Text>UID: {props.userUID}</Text>
             
             <TouchableOpacity style={styles.button} onPress={props.signOut}>
                 <Text style={styles.buttonText}>
@@ -19,10 +20,10 @@ const SideMenuItems = (props) => {
 
             <TouchableOpacity style={styles.button} onPress={props.openPopupDialog}>
                 <Text style={styles.buttonText}>
-                    Add a Babysitter
+                    Add a {props.accountType === "parent" ? "Babysitter" : "Parent"}
                 </Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -38,6 +39,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "500",
         padding: 8
+    },
+
+    userIcon: {
+        maxHeight: 100
     }
 });
 

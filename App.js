@@ -45,6 +45,7 @@ export default class App extends React.Component {
       oppositeUsers: [],
       oppositeUser: undefined,
       oppositeUserUID: "",
+      reminders: [],
 
       addReminder: false,
 
@@ -62,6 +63,7 @@ export default class App extends React.Component {
     this.openAddBabysitterPopup = this.openAddBabysitterPopup.bind(this);
     this.openAddReminderPopup = this.openAddReminderPopup.bind(this);
     this.addReminder = this.addReminder.bind(this);
+    this.deleteReminder = this.deleteReminder.bind(this);
     this.addBabysitter = this.addBabysitter.bind(this);
     this.addParent = this.addParent.bind(this);
 
@@ -74,6 +76,7 @@ export default class App extends React.Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         firestore.collection("parentUsers").doc(user.uid).get().then(parentUserDoc => {
+          // if parent
           if (parentUserDoc.data()) {
             this.setState({user: parentUserDoc.data(), userUID: user.uid, accountType: "parent"});
 
@@ -90,13 +93,28 @@ export default class App extends React.Component {
 
               if (oppositeUsers.length > 0) {
                 firestore.collection("babysitterUsers").doc(oppositeUsers[0]).get().then( babysitterUserDoc => {
-                  this.setState({oppositeUser: babysitterUserDoc.data(), oppositeUsers});
-                }).catch(() => {
-                  console.log("Error fetching oppositeUsers[0]");
+                  this.setState({oppositeUser: babysitterUserDoc.data(), oppositeUserUID: babysitterUserDoc.id, oppositeUsers});
+
+                  // Fetch reminders
+                  firestore.collection("parentUsers").doc(user.uid).collection("babysitters").doc(babysitterUserDoc.id).get().then( doc => {
+                    let reminders = [];
+        
+                    doc.data().reminders.forEach( reminder => {
+                        reminders = [...reminders, reminder];
+                    })
+        
+                    this.setState({reminders});
+                  }).catch( error => {
+                    console.log(error);
+                  });
+                }).catch( error => {
+                  console.log("Error fetching oppositeUsers[0]:\n" + error);
                 });
               }
             });
-          } else {
+          }
+          // if babysitter
+          else {
             firestore.collection("babysitterUsers").doc(user.uid).get().then(babysitterUserDoc => {
               this.setState({user: babysitterUserDoc.data(), userUID: user.uid, accountType: "babysitter"});
             });
@@ -114,15 +132,30 @@ export default class App extends React.Component {
 
               if (oppositeUsers.length > 0) {
                 firestore.collection("parentUsers").doc(oppositeUsers[0]).get().then( parentUserDoc => {
-                  this.setState({oppositeUser: parentUserDoc.data(), oppositeUsers});
-                }).catch(() => {
-                  console.log("Error fetching oppositeUsers[0]");
+                  this.setState({oppositeUser: parentUserDoc.data(), oppositeUserUID: parentUserDoc.id, oppositeUsers});
+
+                  // Fetch reminders
+                  firestore.collection("parentUsers").doc(parentUserDoc).collection("babysitters").doc(user.uid).get().then( doc => {
+                    let reminders = [];
+        
+                    doc.data().reminders.forEach( reminder => {
+                        reminders = [...reminders, reminder];
+                    })
+        
+                    this.setState({reminders});
+                  }).catch( error => {
+                    console.log(error);
+                  });
+                }).catch( error => {
+                  console.log("Error fetching oppositeUsers[0]:\n" + error);
                 });
               }
             });
           }
         });
       }
+
+
     });
 
     // SideMenu
@@ -160,16 +193,35 @@ export default class App extends React.Component {
     this.addBabysitterPopupDialog.show();
   };
 
+  deleteReminder(nextProps) {
+    let isAccountTypeParent = this.state.accountType === "parent";
+    console.log("hello");
+
+    if (nextProps.reminders !== this.state.reminders) {
+      this.setState({ reminders: nextProps.reminders });
+
+      console.log(this.state.reminders);
+
+      firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).update({
+        reminders: this.state.reminders
+      });
+    }
+
+    console.log(this.state.reminders);
+  }
+
   openAddReminderPopup() {
     this.addReminderPopupDialog.show();
   };
 
-  addReminder(text) {
-    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).set({
-        "reminderTest": text
+  addReminder(title, text) {
+    let ar = [...this.state.reminders, {title, text}];
+
+    firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(this.state.oppositeUserUID).update({
+        reminders: ar
     });
 
-    console.log(text);
+    this.setState({reminders: ar});
   };
 
   addBabysitter() {
@@ -379,7 +431,7 @@ export default class App extends React.Component {
                   }
                   {
                     this.state.currentPage === "reminders" &&
-                      <Reminders user={user} popupDialog={this.openAddReminderPopup} />
+                      <Reminders reminders = {this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder}/>
                   }
                   {
                     this.state.currentPage === "babyInfo" &&
@@ -409,7 +461,7 @@ export default class App extends React.Component {
               dialogTitle={<DialogTitle title="Add Reminder" />}
             >
               <View style={{zIndex:1}}>
-                <ReminderModal addReminder={(text) => this.addReminder(text)}/>
+                <ReminderModal addReminder={(title,text) => this.addReminder(title,text)}/>
               </View>
             </PopupDialog>
 

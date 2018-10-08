@@ -8,7 +8,8 @@ export default class ReminderModal extends Component {
         super(props);
 
         this.state = {
-            text: ""
+            text: "",
+            title: ""
         }
     }
     
@@ -16,8 +17,14 @@ export default class ReminderModal extends Component {
         return(
             <View >
                 <Text>Add a Reminder</Text>
+
+                <Text>Title</Text>
+                <TextInput value={this.state.title} onChangeText={a => this.setState({title: a})}/>
+
+                <Text>Text</Text>
                 <TextInput value={this.state.text} onChangeText={a => this.setState({text: a})}/>
-                <Button title="Add Reminder" onPress={() => {this.props.addReminder(this.state.text)}}/>
+
+                <Button title="Add Reminder" onPress={() => {this.props.addReminder(this.state.title, this.state.text)}}/>
             </View>
         );
     }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'React';
 import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, /* SideMenu */ Animated, Easing } from 'react-native';
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
@@ -40,6 +40,7 @@ export default class App extends React.Component {
       errMsg: "",
       oppositeUsers: [],
       oppositeUser: "",
+      reminders: [],
 
       addReminder: false,
 
@@ -61,6 +62,7 @@ export default class App extends React.Component {
     this.showSideMenu = this.showSideMenu.bind(this);
     this.hideSideMenu = this.hideSideMenu.bind(this);
     this.addBabysitter = this.addBabysitter.bind(this);
+    this.DeleteReminder = this.DeleteReminder.bind(this);
   };
 
   componentDidMount() {
@@ -73,21 +75,36 @@ export default class App extends React.Component {
           doc.forEach(function(doc2) {
             if (doc2.id != "test") {
               ar.push({id: doc2.id, email: doc2.data().email});
-              console.log(doc2.id)
             }
           })
-          console.log(ar)
 
           if (ar.length >= 1) {
-            this.setState({oppositeUsers: ar}) 
+            this.setState({oppositeUsers: ar});
+            this.setState({oppositeUser: this.state.oppositeUsers[0]});
           }
 
-          console.log(this.state.oppositeUsers);
+
+          firestore.collection('parentUsers').doc(user.uid).collection("babysitters").doc(this.state.oppositeUser.id).get().then(doc => {
+            let ar = [];
+
+            doc.data().reminders.forEach( (a) => {
+                ar = [...ar, a];
+            })
+
+            this.setState({reminders: ar});
+
+          }).catch(function(error) {
+            console.log(error);
+          })
+
+          
       }).catch(function(error) {
           console.log("Error getting document:", error);
       });
       
       }
+
+
     });
 
     // SideMenu
@@ -121,16 +138,37 @@ export default class App extends React.Component {
     this.addBabysitterPopupDialog.show();
   }
 
+
+  DeleteReminder(nextProps) {
+    console.log("hello");
+
+    if (nextProps.reminders !== this.state.reminders) {
+      this.setState({ reminders: nextProps.reminders });
+
+      console.log(this.state.reminders);
+
+      firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
+        reminders: this.state.reminders
+      });
+    }
+
+    console.log(this.state.reminders);
+
+
+  }
+
   openAddReminderPopup() {
     this.addReminderPopupDialog.show();
   }
 
-  addReminder(text) {
-    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).set({
-        "reminderTest": text
+  addReminder(title, text) {
+    let ar = [...this.state.reminders, {title, text}]
+
+    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
+        reminders: ar
     });
 
-    console.log(text);
+    this.setState({reminders: ar});
   }
 
 
@@ -305,7 +343,7 @@ export default class App extends React.Component {
                   }
                   {
                     this.state.currentPage === "reminders" &&
-                      <Reminders user={user} popupDialog={this.openAddReminderPopup} />
+                      <Reminders reminders = {this.state.reminders} popupDialog={this.openAddReminderPopup} DeleteReminder = {this.DeleteReminder}/>
                   }
                   {
                     this.state.currentPage === "babyInfo" &&
@@ -335,7 +373,7 @@ export default class App extends React.Component {
               dialogTitle={<DialogTitle title="Add Reminder" />}
             >
               <View style={{zIndex:1}}>
-                <ReminderModal addReminder={(text) => this.addReminder(text)}/>
+                <ReminderModal addReminder={(title,text) => this.addReminder(title,text)}/>
               </View>
             </PopupDialog>
 

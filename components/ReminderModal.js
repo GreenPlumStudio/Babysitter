@@ -10,8 +10,8 @@ export default class ReminderModal extends Component {
         this.state = {
             text: "",
             title: ""
-        }
-    }
+        };
+    };
     
     render() {
         return(
@@ -33,5 +33,5 @@ export default class ReminderModal extends Component {
                 }}/>
             </View>
         );
-    }
-}
+    };
+};

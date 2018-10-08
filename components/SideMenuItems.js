@@ -10,7 +10,7 @@ const SideMenuItems = (props) => {
 
             <Text>{props.user.firstName} {props.user.lastName}</Text>
 
-            <Text>UID: {props.userUID}</Text>
+            <Text>{props.username}</Text>
             
             <TouchableOpacity style={styles.button} onPress={props.signOut}>
                 <Text style={styles.buttonText}>

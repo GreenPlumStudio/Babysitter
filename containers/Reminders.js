@@ -3,22 +3,15 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import {ReminderCell} from './ReminderCell';
 import {firebase, firestore} from '../utils/firebase';
 
-
-
 export default class Reminders extends Component {
     constructor(props) {
         super(props);
-        
-        
 
         this.state = {
             reminders: this.props.reminders
         };
 
-        console.log(this.props.reminders);
-
         this.deleteReminder = this.deleteReminder.bind(this);
-
     };
 
     deleteReminder(i) {
@@ -29,10 +22,6 @@ export default class Reminders extends Component {
             this.setState({reminders: []});
         }
         else {this.setState({reminders: ar});}
-
-        
-        console.log(i);
-        console.log(this.state.reminders)
 
         this.props.deleteReminder(this.state.reminders);
     }
@@ -48,9 +37,7 @@ export default class Reminders extends Component {
                     )}</View>
                 }
 
-
                 <Button title="Add a Reminder" onPress={this.props.popupDialog} />
-                
             </View>
         );
     };

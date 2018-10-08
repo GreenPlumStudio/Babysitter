@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, /* SideMenu~ */ Animated, Easing, /* ~SideMenu */ /* Ignore Warning~ */ YellowBox } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, Keyboard, /* SideMenu~ */ Animated, Easing, /* ~SideMenu */ /* Ignore Warning~ */ YellowBox } from 'react-native';
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
 
@@ -39,7 +39,9 @@ export default class App extends React.Component {
       accountType: "",
       loginOrSignup: "login",
       currentPage: "messages",
+      parentUsername: "",
       parentUID: "",
+      babysitterUsername: "",
       babysitterUID: "",
       errMsg: "",
       oppositeUsers: [],
@@ -182,6 +184,7 @@ export default class App extends React.Component {
         accountType: "",
         loginOrSignup: "login",
         currentPage: "messages",
+        errMsg: "",
         oppositeUsers: [],
         oppositeUser: undefined,
         oppositeUserUID: "",
@@ -198,129 +201,129 @@ export default class App extends React.Component {
   };
 
   deleteReminder(nextProps) {
-    
-
     if (nextProps == undefined) {
       this.setState({ reminders: [] });
-   } else {
-    this.setState({ reminders: nextProps });
-   }
+    } else {
+      this.setState({ reminders: nextProps });
+    }
 
-   console.log(this.state.reminders);
-   console.log(this.state.userUID);
-   console.log(this.state.oppositeUserUID);
+    console.log(this.state.reminders);
+    console.log(this.state.userUID);
+    console.log(this.state.oppositeUserUID);
 
-   if (this.state.userUID == undefined) {
-     console.log("not working1 ");
-   } 
-   if (this.state.oppositeUserUID == undefined) {
-    console.log("not working2 ");
-  }
+    if (this.state.userUID == undefined) {
+      console.log("not working1 ");
+    } 
+    if (this.state.oppositeUserUID == undefined) {
+      console.log("not working2 ");
+    }
 
-  if (this.state.reminders == undefined) {
-    console.log("not working2 ");
-  }
+    if (this.state.reminders == undefined) {
+      console.log("not working2 ");
+    }
 
     firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(this.state.oppositeUserUID).update({
       reminders: this.state.reminders
     });
-
-  }
+  };
 
   openAddReminderPopup() {
     this.addReminderPopupDialog.show();
   };
 
   addReminder(title, text) {
-
     this.addReminderPopupDialog.dismiss();
-    console.log(this.state.reminders);
-    console.log("u troll");
 
     let ar = [];
     if (this.state.reminders == undefined) {
-       ar = [{title, text}]
+      ar = [{title, text}];
     } else {
-       ar = [...this.state.reminders, {title, text}]
+      ar = this.state.reminders;
+      ar.push({title, text});
     }
 
     this.setState({reminders: ar});
-    console.log(this.state.reminders);
-
 
     firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(this.state.oppositeUserUID).update({
         reminders: this.state.reminders
     });
-
-    this.forceUpdate();
-  }
-
-  addBabysitter() {
-    let babysitterUID = this.state.babysitterUID;
-    firestore.collection("babysitterUsers").get().then( col => {
-      let doesBabysitterExist = false;
-
-      col.forEach( doc => {
-        if (doc.id === babysitterUID) {
-          doesBabysitterExist = true;
-        }
-      });
-
-      if (!doesBabysitterExist) {
-        this.setState({errMsg: "babysitterUID does not Exist"});
-        return;
-      }
-    });
-    
-    firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(babysitterUID).set({
-      "messages": [],
-      "reminders": [],
-      "babyInfo": {}
-    });
-
-    firestore.collection("babysitterUsers").doc(babysitterUID).collection("parents").doc(this.state.userUID).set({
-      "exists": true
-    });
-
-    firestore.collection("babysitterUsers").doc(babysitterUID).get().then( doc => {
-      this.setState({oppositeUser: doc.data(), oppositeUserUID: babysitterUID});
-    });
-    
-    this.setState({babysitterUID: ""});
   };
 
-  addParent() {
-    let parentUID = this.state.parentUID;
-    firestore.collection("parentUsers").get().then( col => {
-      let doesParentExist = false;
-
+  addBabysitter(babysitterUsername) {
+    firestore.collection("babysitterUsernameToUID").get().then( col => {
       col.forEach( doc => {
-        if (doc.id === parentUID) {
-          doesParentExist = true;
+        if (doc.id === babysitterUsername) {
+          this.setState({babysitterUID: doc.data().uid});
         }
       });
 
-      if (!doesParentExist) {
-        this.setState({errMsg: "parentUID does not Exist"});
+      let babysitterUID = this.state.babysitterUID;
+
+      if (!babysitterUID) {
+        this.setState({errMsg: "Babysitter Username does not exist"});
         return;
       }
-    });
-    
-    firestore.collection("parentUsers").doc(parentUID).collection("babysitters").doc(this.state.userUID).set({
-      "messages": [],
-      "reminders": [],
-      "babyInfo": {}
-    });
+      
+      firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(babysitterUID).set({
+        "messages": [],
+        "reminders": [],
+        "babyInfo": {}
+      });
+  
+      firestore.collection("babysitterUsers").doc(babysitterUID).collection("parents").doc(this.state.userUID).set({
+        "exists": true
+      });
+  
+      firestore.collection("babysitterUsers").doc(babysitterUID).get().then( doc => {
+        this.setState({oppositeUser: doc.data(), oppositeUserUID: babysitterUID});
+      });
+      
+      this.setState({babysitterUsername: "", babysitterUID: ""});
 
-    firestore.collection("babysitterUsers").doc(this.state.userUID).collection("parents").doc(parentUID).set({
-      "exists": true
+      Keyboard.dismiss();
+      this.addBabysitterPopupDialog.dismiss();  
     });
+  };
 
-    firestore.collection("parentUsers").doc(parentUID).get().then( doc => {
-      this.setState({oppositeUser: doc.data(), oppositeUserUID: parentUID});
+  addParent(parentUsername) {
+    parentUsername += "";
+    console.log("parentUsername: " + parentUsername);
+
+    firestore.collection("parentUsernameToUID").get().then( col => {
+      col.forEach( doc => {
+        console.log(doc.id);
+        if (doc.id === parentUsername) {
+          this.setState({parentUID: doc.data().uid});
+          console.log("match!");
+        }
+      });
+
+      let parentUID = this.state.parentUID;
+
+      if (!parentUID) {
+        this.setState({errMsg: "Parent Username does not exist"});
+        return;
+      }
+      
+      firestore.collection("parentUsers").doc(parentUID).collection("babysitters").doc(this.state.userUID).set({
+        "messages": [],
+        "reminders": [],
+        "babyInfo": {}
+      });
+  
+      firestore.collection("babysitterUsers").doc(this.state.userUID).collection("parents").doc(parentUID).set({
+        "exists": true
+      });
+  
+      firestore.collection("parentUsers").doc(parentUID).get().then( doc => {
+        this.setState({oppositeUser: doc.data(), oppositeUserUID: parentUID});
+      });
+      
+      this.setState({parentUsername: "", parentUID: ""});
+
+      Keyboard.dismiss();
+      this.addBabysitterPopupDialog.dismiss();  
     });
-    
-    this.setState({parentUID: ""});
   };
   
   backToChooseAccountType() {
@@ -397,7 +400,7 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} userUID={this.state.userUID} accountType={this.state.accountType} />
+              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} />
             </Animated.View>
 
             {
@@ -444,8 +447,9 @@ export default class App extends React.Component {
                 <View>
                   <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
 
-                  <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " UID"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUID : this.state.parentUID} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUID: text}) : text => this.setState({parentUID: text})}/>
-                  <Button style={{zIndex: 1}} title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? this.addBabysitter : this.addParent} />
+                  <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " Username"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
+                  <Text>{this.state.errMsg}</Text>
+                  <Button style={{zIndex: 1}} title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
                 </View>
               </View>
             }
@@ -477,10 +481,10 @@ export default class App extends React.Component {
               height={0.6}
               dialogAnimation={addBabysitterPopup}
               ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
-              dialogTitle={<DialogTitle title="Add a Babysitter" />}
+              dialogTitle={<DialogTitle title={this.state.accountType === "parent" ? "Add a Babysitter" : "Add a Parent"} />}
             >
               <View style={{zIndex:1}}>
-                <AddBabysitterModal addBabysitter = {(text) => this.addBabysitter(text)} />
+                <AddBabysitterModal accountType={this.state.accountType} addParent={this.addParent} addBabysitter={this.addBabysitter} />
               </View>
             </PopupDialog>
 
@@ -492,7 +496,7 @@ export default class App extends React.Component {
               dialogTitle={<DialogTitle title="Add Reminder" />}
             >
               <View style={{zIndex:1}}>
-                <ReminderModal addReminder={(title,text) => this.addReminder(title,text)}/>
+                <ReminderModal addReminder={this.addReminder}/>
               </View>
             </PopupDialog>
 

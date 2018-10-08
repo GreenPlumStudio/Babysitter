@@ -24,9 +24,16 @@ export default class LoginPage extends Component {
             this.setState({errMsg: "Please fill out all fields"});
             return;
         } else if (this.state.password !== this.state.confirmPassword) {
-            this.setState({errMsg: ("Passwords do not match")});
+            this.setState({errMsg: "Passwords do not match"});
             return;
         }
+
+        firestore.collection(this.props.accountType + "UsernameToUID").get().then( col => {
+            if (col.docs.includes(this.state.username)) {
+                this.setState({errMsg: "Username already exists"});
+                return;
+            }
+        });
 
         firebase.auth().createUserWithEmailAndPassword(this.state.emailAddress, this.state.password)
             .then(() => {
@@ -43,6 +50,10 @@ export default class LoginPage extends Component {
 
                 firestore.collection(colType).doc(user.uid).collection(oppositeColType).doc("placeholder").set({
                     placeholder: "placeholder"
+                });
+
+                firestore.collection(this.props.accountType + "UsernameToUID").doc(username).set({
+                    uid: user.uid
                 });
             })
             .catch(err => {

@@ -22,7 +22,17 @@ export default class Reminders extends Component {
     };
 
     deleteReminder(i) {
-        this.setState({reminders: this.state.reminders.splice(i, 1)});
+        let ar = this.state.reminders;
+        ar.splice(i, 1);
+
+        if (ar === null || ar === undefined) {
+            this.setState({reminders: []});
+        }
+        else {this.setState({reminders: ar});}
+
+        
+        console.log(i);
+        console.log(this.state.reminders)
 
         this.props.DeleteReminder(this.state.reminders);
     }
@@ -32,9 +42,11 @@ export default class Reminders extends Component {
             <View>
                 <Text>Reminders</Text>
                 
-        <View>{this.state.reminders.map((reminder, i) => 
-                <ReminderCell reminder={reminder} deleteReminder={this.deleteReminder} i={i}/>
-        )}</View>
+                {this.state.reminders &&
+                    <View>{this.state.reminders.map((reminder, i) => 
+                            <ReminderCell reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i}/>
+                    )}</View>
+                }
 
 
                 <Button title="Add a Reminder" onPress={this.props.popupDialog} />

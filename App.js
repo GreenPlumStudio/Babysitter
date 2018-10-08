@@ -65,6 +65,10 @@ export default class App extends React.Component {
     this.DeleteReminder = this.DeleteReminder.bind(this);
   };
 
+  componentWillReceiveProps(newProps) {
+    this.setState({reminders: newProps.reminders});
+  }
+
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -140,20 +144,17 @@ export default class App extends React.Component {
 
 
   DeleteReminder(nextProps) {
-    console.log("hello");
+    
 
-    if (nextProps.reminders !== this.state.reminders) {
-      this.setState({ reminders: nextProps.reminders });
+    if (nextProps == undefined) {
+      this.setState({ reminders: [] });
+   } else {
+    this.setState({ reminders: nextProps });
+   }
 
-      console.log(this.state.reminders);
-
-      firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
-        reminders: this.state.reminders
-      });
-    }
-
-    console.log(this.state.reminders);
-
+    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
+      reminders: this.state.reminders
+    });
 
   }
 
@@ -162,13 +163,26 @@ export default class App extends React.Component {
   }
 
   addReminder(title, text) {
-    let ar = [...this.state.reminders, {title, text}]
 
-    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
-        reminders: ar
-    });
+    this.addReminderPopupDialog.dismiss();
+    console.log(this.state.reminders);
+    console.log("u troll");
+
+    let ar = [];
+    if (this.state.reminders == undefined) {
+       ar = [{title, text}]
+    } else {
+       ar = [...this.state.reminders, {title, text}]
+    }
 
     this.setState({reminders: ar});
+    console.log(this.state.reminders);
+
+
+    firestore.collection("parentUsers").doc(firebase.auth().currentUser.uid).collection("babysitters").doc(this.state.oppositeUser.id).update({
+        reminders: this.state.reminders
+    });
+
   }
 
 
@@ -208,8 +222,10 @@ export default class App extends React.Component {
     firestore.collection("babysitterUsers").get().doc(babyUid).then(function(querySnapshot) {
       
     });
+    this.setState({oppositeUser: babyUid});
 
-    this.setState({oppositeUser: babyUid})
+    this.forceUpdate();
+
   }
   
   backToChooseAccountType() {

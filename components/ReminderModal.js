@@ -1,5 +1,5 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View, Dimensions, TextInput, Button } from 'react-native';
+import { StyleSheet, Keyboard, Text, View, Dimensions, TextInput, Button } from 'react-native';
 
 var screen = Dimensions.get('window');
 
@@ -19,12 +19,18 @@ export default class ReminderModal extends Component {
                 <Text>Add a Reminder</Text>
 
                 <Text>Title</Text>
-                <TextInput value={this.state.title} onChangeText={a => this.setState({title: a})}/>
+                <TextInput ref={input1 => { this.textInput1 = input1 }} value={this.state.title} onChangeText={a => this.setState({title: a})}/>
 
                 <Text>Text</Text>
-                <TextInput value={this.state.text} onChangeText={a => this.setState({text: a})}/>
+                <TextInput ref={input2 => { this.textInput2 = input2 }} value={this.state.text} onChangeText={a => this.setState({text: a})}/>
 
-                <Button title="Add Reminder" onPress={() => {this.props.addReminder(this.state.title, this.state.text)}}/>
+                <Button title="Add Reminder" onPress={() => {
+                    this.textInput1.clear();
+                    this.textInput2.clear();
+                    Keyboard.dismiss();
+                    this.props.addReminder(this.state.title, this.state.text);
+
+                }}/>
             </View>
         );
     }

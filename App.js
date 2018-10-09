@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, Keyboard, /* SideMenu~ */ Animated, Easing, /* ~SideMenu */ /* Ignore Warning~ */ YellowBox } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity, Image, Keyboard, ImageBackground, /* SideMenu~ */ Animated, Easing, /* ~SideMenu */ /* Ignore Warning~ */ YellowBox } from 'react-native';
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
 
@@ -68,6 +68,8 @@ export default class App extends React.Component {
     this.deleteReminder = this.deleteReminder.bind(this);
     this.addBabysitter = this.addBabysitter.bind(this);
     this.addParent = this.addParent.bind(this);
+    this.switchCurOppositeUser = this.switchCurOppositeUser.bind(this);
+    this.fetchReminders = this.fetchReminders.bind(this);
 
     // SideMenu
     this.showSideMenu = this.showSideMenu.bind(this);
@@ -76,7 +78,7 @@ export default class App extends React.Component {
 
   componentWillReceiveProps(newProps) {
     this.setState({reminders: newProps.reminders});
-  }
+  };
 
   componentWillMount() {
     firebase.auth().onAuthStateChanged(user => {
@@ -95,6 +97,7 @@ export default class App extends React.Component {
                   let curOppositeUserData = oppositeUser.data();
                   let curOppositeUser = {
                     email: curOppositeUserData.email,
+                    username: curOppositeUserData.username,
                     firstName: curOppositeUserData.firstName,
                     lastName: curOppositeUserData.lastName,
                   }
@@ -109,11 +112,7 @@ export default class App extends React.Component {
 
               if (oppositeUsers.length > 0) {
                 // Fetch reminders
-                firestore.collection("parentUsers").doc(user.uid).collection("babysitters").doc(this.state.oppositeUserUID).get().then( doc => {
-                  this.setState({reminders: doc.data().reminders});
-                }).catch( error => {
-                  console.log("Parent user: error fetching reminders:\n" + error);
-                });
+                this.fetchReminders();
               }
             }).catch( error => {
               console.log("Parent user: error fetching connected babysitters collection:\n" + error);
@@ -133,6 +132,7 @@ export default class App extends React.Component {
                     let curOppositeUserData = oppositeUser.data();
                     let curOppositeUser = {
                       email: curOppositeUserData.email,
+                      username: curOppositeUserData.username,
                       firstName: curOppositeUserData.firstName,
                       lastName: curOppositeUserData.lastName,
                     }
@@ -147,11 +147,7 @@ export default class App extends React.Component {
   
                 if (oppositeUsers.length > 0) {
                   // Fetch reminders
-                  firestore.collection("parentUsers").doc(this.state.oppositeUserUID).collection("babysitters").doc(user.uid).get().then( doc => {
-                    this.setState({reminders: doc.data().reminders});
-                  }).catch( error => {
-                    console.log("Babysitter user: error fetching reminders:\n" + error);
-                  });
+                  this.fetchReminders();
                 }
               }).catch( error => {
                 console.log("Babysitter user: error fetching connected parents collection:\n" + error);
@@ -168,6 +164,15 @@ export default class App extends React.Component {
     // setTimeout(()=>{
     //   this.showSideMenu();
     // }, 1000);
+  };
+
+  fetchReminders() {
+    let isAccountTypeParent = this.state.accountType === "parent";
+    firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
+      this.setState({reminders: doc.data().reminders});
+    }).catch( error => {
+      console.log("Error fetching reminders:\n" + error);
+    });
   };
 
   changeAccountType(accountType) {
@@ -273,12 +278,14 @@ export default class App extends React.Component {
           "reminders": [],
           "babyInfo": {},
           "email": babysitterDocData.email,
+          "username": babysitterUsername,
           "firstName": babysitterDocData.firstName,
           "lastName": babysitterDocData.lastName
         });
 
         let babysitter = {
           email: babysitterDocData.email,
+          username: babysitterUsername,
           firstName: babysitterDocData.firstName,
           lastName: babysitterDocData.lastName
         };
@@ -287,6 +294,7 @@ export default class App extends React.Component {
   
         firestore.collection("babysitterUsers").doc(babysitterUID).collection("parents").doc(userUID).set({
           "email": user.email,
+          "username": user.username,
           "firstName": user.firstName,
           "lastName": user.lastName
         });
@@ -327,12 +335,14 @@ export default class App extends React.Component {
           "reminders": [],
           "babyInfo": {},
           "email": user.email,
+          "username": user.username,
           "firstName": user.firstName,
           "lastName": user.lastName
         });
 
         let parent = {
           email: parentDocData.email,
+          username: parentDocData.username,
           firstName: parentDocData.firstName,
           lastName: parentDocData.lastName
         };
@@ -341,6 +351,7 @@ export default class App extends React.Component {
   
         firestore.collection("babysitterUsers").doc(userUID).collection("parents").doc(parentUID).set({
           "email": parentDocData.email,
+          "username": parentDocData.username,
           "firstName": parentDocData.firstName,
           "lastName": parentDocData.lastName
         });
@@ -351,6 +362,21 @@ export default class App extends React.Component {
   
         Keyboard.dismiss();
         this.addBabysitterPopupDialog.dismiss(); 
+      });
+    });
+  };
+
+  switchCurOppositeUser(oppositeUsername) {
+    let oppositeAccountType = this.state.accountType === "parent" ? "babysitter" : "parent";
+    firestore.collection(oppositeAccountType + "UsernameToUID").doc(oppositeUsername).get().then( doc => {
+      let oppositeUserUID = doc.data().uid;
+      firestore.collection(oppositeAccountType + "Users").doc(oppositeUserUID).get().then( oppositeUserDoc => {
+        this.setState({
+          oppositeUser: oppositeUserDoc.data(),
+          oppositeUserUID
+        });
+        this.fetchReminders();
+        this.hideSideMenu();
       });
     });
   };
@@ -396,6 +422,7 @@ export default class App extends React.Component {
   render() {
     let user = this.state.user;
     let isAccountTypeParent = this.state.accountType === "parent";
+    let hasOppositeUsers = this.state.oppositeUsers.length > 0;
     
     return (
       <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
@@ -429,7 +456,7 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} />
+              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} />
             </Animated.View>
 
             {
@@ -448,30 +475,39 @@ export default class App extends React.Component {
                 />
             }
             {/* ~Side Menu */}
+            
+            {/* Top Menu Bar~ */}
+            <ImageBackground source={require("./assets/topMenuBarBackground.png")} style={{height: hasOppositeUsers ? 85 : 55, zIndex: 0}}>
+              <View>
+                <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
+                  <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require("./assets/hamburgerMenuIcon.png")} />
+                </TouchableOpacity>
 
-            <View style={{height: 55, backgroundColor: "white", zIndex: 0}}>
-              <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
-                <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require('./assets/hamburgerMenuIcon.png')} />
-              </TouchableOpacity>
+                <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20, color: "#f8f8ff"}}>
+                  {
+                    this.state.oppositeUsers.length == 0 &&
+                    "Please add a " + (this.state.accountType === "parent" ? "Babysitter" : "Parent")
+                  }
+                  {
+                    this.state.oppositeUsers.length > 0 &&
+                    this.state.oppositeUser.firstName + " " + this.state.oppositeUser.lastName
+                  }
+                </Text>
 
-              <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20}}>
-                {
-                  this.state.oppositeUsers.length == 0 &&
-                  "Please add a " + (this.state.accountType === "parent" ? "Babysitter" : "Parent")
-                }
-                {
-                  this.state.oppositeUsers.length > 0 &&
-                  this.state.oppositeUser.firstName + " " + this.state.oppositeUser.lastName
-                }
-              </Text>
-
-              <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
-                <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require('./assets/antMenuIcon.png')} />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
+                  <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require("./assets/antMenuIcon.png")} />
+                </TouchableOpacity>
+              </View>
+              
+              {
+                hasOppositeUsers &&
+                <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
+              }
+            </ImageBackground>
+            {/* ~Top Menu Bar */}
 
             {
-              this.state.oppositeUsers.length == 0 &&
+              !hasOppositeUsers &&
               <View style={{zIndex: 0}}>
                 <View>
                   <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
@@ -484,10 +520,8 @@ export default class App extends React.Component {
             }
 
             {
-              this.state.oppositeUsers.length > 0 &&
+              hasOppositeUsers &&
               <View style={{flex: 1, zIndex: 0}}>
-                <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
-        
                 <View>
                   {
                     this.state.currentPage === "messages" &&

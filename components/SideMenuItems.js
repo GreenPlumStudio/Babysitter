@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 
 const SideMenuItems = (props) => {
     return (
@@ -9,18 +9,29 @@ const SideMenuItems = (props) => {
             </TouchableOpacity>
 
             <Text>{props.user.firstName} {props.user.lastName}</Text>
-
             <Text>{props.username}</Text>
-            
-            <TouchableOpacity style={styles.button} onPress={props.signOut}>
-                <Text style={styles.buttonText}>
-                    SIGN OUT
-                </Text>
-            </TouchableOpacity>
+
+            <Text>{props.accountType === "parent" ? "Babysitters:" : "Parents:"}</Text>
+            <View>
+                {
+                    props.oppositeUsers.map( oppositeUser => (
+                        <TouchableOpacity key={oppositeUser.username} onPress={() => props.switchCurOppositeUser(oppositeUser.username)}>
+                            <Text>{ oppositeUser.firstName + " " + oppositeUser.lastName }</Text>
+                            <Text>{ oppositeUser.username + "   |   " + oppositeUser.email }</Text>
+                        </TouchableOpacity>
+                    ))
+                }
+            </View>
 
             <TouchableOpacity style={styles.button} onPress={props.openPopupDialog}>
                 <Text style={styles.buttonText}>
                     Add a {props.accountType === "parent" ? "Babysitter" : "Parent"}
+                </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={props.signOut}>
+                <Text style={styles.buttonText}>
+                    SIGN OUT
                 </Text>
             </TouchableOpacity>
         </ScrollView>

@@ -421,15 +421,11 @@ export default class App extends React.Component {
   };
 
   render() {
-
-    if (this.state.isLoading === true) {
+    if (this.state.isLoading) {
       return (
-        <View style={{marginTop: Constants.statusBarHeight}}>
-          <Text>Loading...</Text>
-        </View>
+        <View>is Loading</View>
       )
-    }
-    else {
+    } else {
       let user = this.state.user;
       let isAccountTypeParent = this.state.accountType === "parent";
       let hasOppositeUsers = this.state.oppositeUsers.length > 0;
@@ -466,7 +462,7 @@ export default class App extends React.Component {
                   }
                 ]
               }}>
-                <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} />
+                <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} sideMenuWidth={this.halfWidth * 1.4} />
               </Animated.View>
 
               {
@@ -524,7 +520,7 @@ export default class App extends React.Component {
 
                     <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " Username"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
                     <Text>{this.state.errMsg}</Text>
-                    <Button title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
+                    <Button style={{zIndex: 1}} title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
                   </View>
                 </View>
               }
@@ -535,22 +531,22 @@ export default class App extends React.Component {
                   <View>
                     {
                       this.state.currentPage === "messages" &&
-                        <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                        <Messages user={user} />
                     }
                     {
                       this.state.currentPage === "reminders" &&
-                        <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
+                      <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
                     }
                     {
                       this.state.currentPage === "babyInfo" &&
-                        <BabyInfo user={this.state.userUID} />
+                        <BabyInfo user={user} />
                     }
                   </View>
                 </View>
               }
 
               <PopupDialog
-                overlayBackgroundColor={'green'}
+                overlayBackgroundColor={"lightblue"}
                 height={0.6}
                 dialogAnimation={addBabysitterPopup}
                 ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
@@ -562,7 +558,7 @@ export default class App extends React.Component {
               </PopupDialog>
 
               <PopupDialog
-                overlayBackgroundColor={'green'}
+                overlayBackgroundColor={"lightblue"}
                 height={0.6}
                 dialogAnimation={addReminderPopup}
                 ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}

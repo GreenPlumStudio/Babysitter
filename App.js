@@ -462,7 +462,7 @@ export default class App extends React.Component {
                 <View>
                   {
                     this.state.currentPage === "messages" &&
-                      <Messages user={user} />
+                      <Messages user={user} accountType={this.state.accountType} oppositeUser={this.state.oppositeUser} />
                   }
                   {
                     this.state.currentPage === "reminders" &&

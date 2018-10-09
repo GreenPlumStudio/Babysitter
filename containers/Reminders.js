@@ -31,13 +31,17 @@ export default class Reminders extends Component {
             <View>
                 <Text>Reminders</Text>
                 
-                {this.state.reminders &&
-                    <View>{this.state.reminders.map((reminder, i) => 
-                            <ReminderCell reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i}/>
+                {
+                    this.state.reminders &&
+                    <View>{this.state.reminders.map( (reminder, i) => 
+                        <ReminderCell key={i} reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i}/>
                     )}</View>
                 }
 
-                <Button title="Add a Reminder" onPress={this.props.popupDialog} />
+                {
+                    this.props.accountType === "parent" &&
+                    <Button title="Add a Reminder" onPress={this.props.popupDialog} />
+                }
             </View>
         );
     };

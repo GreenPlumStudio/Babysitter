@@ -29,37 +29,44 @@ export default class LoginPage extends Component {
         }
 
         firestore.collection(this.props.accountType + "UsernameToUID").get().then( col => {
-            if (col.docs.includes(this.state.username)) {
-                this.setState({errMsg: "Username already exists"});
-                return;
-            }
-        });
+            
+            // check if username already exists~
+            let doesUsernameExist = false;
+            col.docs.forEach( doc => {
+                if (doc.id === this.state.username) {
+                    this.setState({errMsg: "Username already exists"});
+                    doesUsernameExist = true;
+                    return;
+                }
+            });
+            if (doesUsernameExist) return;
+            // ~check if username already exists
 
-        firebase.auth().createUserWithEmailAndPassword(this.state.emailAddress, this.state.password)
-            .then(() => {
+            firebase.auth().createUserWithEmailAndPassword(this.state.emailAddress, this.state.password).then(() => {
                 let user = firebase.auth().currentUser;
                 let colType = this.props.accountType + "Users";
                 let oppositeColType = this.props.accountType === "parent" ? "babysitters" : "parents";
-
+    
                 firestore.collection(colType).doc(user.uid).set({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
                     username: this.state.username,
                     email: this.state.emailAddress
                 });
-
+    
                 firestore.collection(colType).doc(user.uid).collection(oppositeColType).doc("placeholder").set({
                     placeholder: "placeholder"
                 });
-
-                firestore.collection(this.props.accountType + "UsernameToUID").doc(username).set({
+    
+                firestore.collection(this.props.accountType + "UsernameToUID").doc(this.state.username).set({
                     uid: user.uid
                 });
             })
-            .catch(err => {
-                console.log(this.state.emailAddress);
-                this.setState({errMsg: err.message});
+            .catch(error => {
+                console.log("Error creating user w/ email/password:\n" + error);
+                this.setState({errMsg: error.message});
             });
+        });
     };
 
     render() {

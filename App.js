@@ -81,7 +81,7 @@ export default class App extends React.Component {
   componentWillMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        firestore.collection("parentUsers").doc(user.uid).get().then(parentUserDoc => {
+        firestore.collection("parentUsers").doc(user.uid).get().then( parentUserDoc => {
           // if parent
           if (parentUserDoc.data()) {
             this.setState({user: parentUserDoc.data(), userUID: user.uid, accountType: "parent"});
@@ -90,78 +90,76 @@ export default class App extends React.Component {
               let oppositeUsers = new Array(col.size-1);
               
               let ix = 0;
-              col.docs.forEach( oppositeUser => {
+              col.forEach( oppositeUser => {
                 if (oppositeUser.id !== "placeholder") {
-                  oppositeUsers[ix] = oppositeUser.id;
+                  let curOppositeUserData = oppositeUser.data();
+                  let curOppositeUser = {
+                    email: curOppositeUserData.email,
+                    firstName: curOppositeUserData.firstName,
+                    lastName: curOppositeUserData.lastName,
+                  }
+                  if (ix == 0) {
+                    this.setState({oppositeUser: curOppositeUser, oppositeUserUID: oppositeUser.id});
+                  }
+                  oppositeUsers[ix] = curOppositeUser;
                   ix += 1;
                 }
               });
+              this.setState({oppositeUsers});
 
               if (oppositeUsers.length > 0) {
-                firestore.collection("babysitterUsers").doc(oppositeUsers[0]).get().then( babysitterUserDoc => {
-                  this.setState({oppositeUser: babysitterUserDoc.data(), oppositeUserUID: babysitterUserDoc.id, oppositeUsers});
-
-                  // Fetch reminders
-                  firestore.collection("parentUsers").doc(user.uid).collection("babysitters").doc(babysitterUserDoc.id).get().then( doc => {
-                    let reminders = [];
-        
-                    doc.data().reminders.forEach( reminder => {
-                        reminders = [...reminders, reminder];
-                    })
-        
-                    this.setState({reminders});
-                  }).catch( error => {
-                    console.log(error);
-                  });
+                // Fetch reminders
+                firestore.collection("parentUsers").doc(user.uid).collection("babysitters").doc(this.state.oppositeUserUID).get().then( doc => {
+                  this.setState({reminders: doc.data().reminders});
                 }).catch( error => {
-                  console.log("Error fetching oppositeUsers[0]:\n" + error);
+                  console.log("Parent user: error fetching reminders:\n" + error);
                 });
               }
+            }).catch( error => {
+              console.log("Parent user: error fetching connected babysitters collection:\n" + error);
             });
           }
           // if babysitter
           else {
-            firestore.collection("babysitterUsers").doc(user.uid).get().then(babysitterUserDoc => {
+            firestore.collection("babysitterUsers").doc(user.uid).get().then( babysitterUserDoc => {
               this.setState({user: babysitterUserDoc.data(), userUID: user.uid, accountType: "babysitter"});
-            });
 
-            firestore.collection("babysitterUsers").doc(user.uid).collection("parents").get().then(col => {
-              let oppositeUsers = [col.size-1];
-
-              let ix = 0;
-              col.docs.forEach( oppositeUser => {
-                if (oppositeUser.id !== "placeholder") {
-                  oppositeUsers[ix] = oppositeUser.id;
-                  ix += 1;
-                }
-              });
-
-              if (oppositeUsers.length > 0) {
-                firestore.collection("parentUsers").doc(oppositeUsers[0]).get().then( parentUserDoc => {
-                  this.setState({oppositeUser: parentUserDoc.data(), oppositeUserUID: parentUserDoc.id, oppositeUsers});
-
-                  // Fetch reminders
-                  firestore.collection("parentUsers").doc(parentUserDoc).collection("babysitters").doc(user.uid).get().then( doc => {
-                    let reminders = [];
-        
-                    doc.data().reminders.forEach( reminder => {
-                        reminders = [...reminders, reminder];
-                    })
-        
-                    this.setState({reminders});
-                  }).catch( error => {
-                    console.log(error);
-                  });
-                }).catch( error => {
-                  console.log("Error fetching oppositeUsers[0]:\n" + error);
+              firestore.collection("babysitterUsers").doc(user.uid).collection("parents").get().then( col => {
+                let oppositeUsers = new Array(col.size-1);
+                
+                let ix = 0;
+                col.forEach( oppositeUser => {
+                  if (oppositeUser.id !== "placeholder") {
+                    let curOppositeUserData = oppositeUser.data();
+                    let curOppositeUser = {
+                      email: curOppositeUserData.email,
+                      firstName: curOppositeUserData.firstName,
+                      lastName: curOppositeUserData.lastName,
+                    }
+                    if (ix == 0) {
+                      this.setState({oppositeUser: curOppositeUser, oppositeUserUID: oppositeUser.id});
+                    }
+                    oppositeUsers[ix] = curOppositeUser;
+                    ix += 1;
+                  }
                 });
-              }
+                this.setState({oppositeUsers});
+  
+                if (oppositeUsers.length > 0) {
+                  // Fetch reminders
+                  firestore.collection("parentUsers").doc(this.state.oppositeUserUID).collection("babysitters").doc(user.uid).get().then( doc => {
+                    this.setState({reminders: doc.data().reminders});
+                  }).catch( error => {
+                    console.log("Babysitter user: error fetching reminders:\n" + error);
+                  });
+                }
+              }).catch( error => {
+                console.log("Babysitter user: error fetching connected parents collection:\n" + error);
+              });
             });
           }
         });
       }
-
-
     });
 
     // SideMenu
@@ -250,6 +248,7 @@ export default class App extends React.Component {
   };
 
   addBabysitter(babysitterUsername) {
+    // user is a parent
     firestore.collection("babysitterUsernameToUID").get().then( col => {
       col.forEach( doc => {
         if (doc.id === babysitterUsername) {
@@ -263,38 +262,51 @@ export default class App extends React.Component {
         this.setState({errMsg: "Babysitter Username does not exist"});
         return;
       }
-      
-      firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(babysitterUID).set({
-        "messages": [],
-        "reminders": [],
-        "babyInfo": {}
-      });
-  
-      firestore.collection("babysitterUsers").doc(babysitterUID).collection("parents").doc(this.state.userUID).set({
-        "exists": true
-      });
-  
-      firestore.collection("babysitterUsers").doc(babysitterUID).get().then( doc => {
-        this.setState({oppositeUser: doc.data(), oppositeUserUID: babysitterUID});
-      });
-      
-      this.setState({babysitterUsername: "", babysitterUID: ""});
 
-      Keyboard.dismiss();
-      this.addBabysitterPopupDialog.dismiss();  
+      let user = this.state.user;
+      let userUID = this.state.userUID;
+      firestore.collection("babysitterUsers").doc(babysitterUID).get().then( babysitterDoc => {
+        let babysitterDocData = babysitterDoc.data();
+
+        firestore.collection("parentUsers").doc(userUID).collection("babysitters").doc(babysitterUID).set({
+          "messages": [],
+          "reminders": [],
+          "babyInfo": {},
+          "email": babysitterDocData.email,
+          "firstName": babysitterDocData.firstName,
+          "lastName": babysitterDocData.lastName
+        });
+
+        let babysitter = {
+          email: babysitterDocData.email,
+          firstName: babysitterDocData.firstName,
+          lastName: babysitterDocData.lastName
+        };
+
+        this.state.oppositeUsers.push(babysitter);
+  
+        firestore.collection("babysitterUsers").doc(babysitterUID).collection("parents").doc(userUID).set({
+          "email": user.email,
+          "firstName": user.firstName,
+          "lastName": user.lastName
+        });
+
+        this.setState({oppositeUser: babysitterDocData, oppositeUserUID: babysitterUID});
+
+        this.setState({babysitterUsername: "", babysitterUID: ""});
+  
+        Keyboard.dismiss();
+        this.addBabysitterPopupDialog.dismiss(); 
+      });
     });
   };
 
   addParent(parentUsername) {
-    parentUsername += "";
-    console.log("parentUsername: " + parentUsername);
-
+    // user is a babysitter
     firestore.collection("parentUsernameToUID").get().then( col => {
       col.forEach( doc => {
-        console.log(doc.id);
         if (doc.id === parentUsername) {
           this.setState({parentUID: doc.data().uid});
-          console.log("match!");
         }
       });
 
@@ -304,25 +316,42 @@ export default class App extends React.Component {
         this.setState({errMsg: "Parent Username does not exist"});
         return;
       }
-      
-      firestore.collection("parentUsers").doc(parentUID).collection("babysitters").doc(this.state.userUID).set({
-        "messages": [],
-        "reminders": [],
-        "babyInfo": {}
-      });
-  
-      firestore.collection("babysitterUsers").doc(this.state.userUID).collection("parents").doc(parentUID).set({
-        "exists": true
-      });
-  
-      firestore.collection("parentUsers").doc(parentUID).get().then( doc => {
-        this.setState({oppositeUser: doc.data(), oppositeUserUID: parentUID});
-      });
-      
-      this.setState({parentUsername: "", parentUID: ""});
 
-      Keyboard.dismiss();
-      this.addBabysitterPopupDialog.dismiss();  
+      let user = this.state.user;
+      let userUID = this.state.userUID;
+      firestore.collection("parentUsers").doc(parentUID).get().then( parentDoc => {
+        let parentDocData = parentDoc.data();
+
+        firestore.collection("parentUsers").doc(parentUID).collection("babysitters").doc(userUID).set({
+          "messages": [],
+          "reminders": [],
+          "babyInfo": {},
+          "email": user.email,
+          "firstName": user.firstName,
+          "lastName": user.lastName
+        });
+
+        let parent = {
+          email: parentDocData.email,
+          firstName: parentDocData.firstName,
+          lastName: parentDocData.lastName
+        };
+
+        this.state.oppositeUsers.push(parent);
+  
+        firestore.collection("babysitterUsers").doc(userUID).collection("parents").doc(parentUID).set({
+          "email": parentDocData.email,
+          "firstName": parentDocData.firstName,
+          "lastName": parentDocData.lastName
+        });
+
+        this.setState({oppositeUser: parentDocData, oppositeUserUID: parentUID});
+
+        this.setState({parentUsername: "", parentUID: ""});
+  
+        Keyboard.dismiss();
+        this.addBabysitterPopupDialog.dismiss(); 
+      });
     });
   };
   
@@ -400,7 +429,7 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} />
+              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} />
             </Animated.View>
 
             {
@@ -442,7 +471,7 @@ export default class App extends React.Component {
             </View>
 
             {
-              this.state.oppositeUsers.length === 0 &&
+              this.state.oppositeUsers.length == 0 &&
               <View style={{zIndex: 0}}>
                 <View>
                   <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
@@ -466,7 +495,7 @@ export default class App extends React.Component {
                   }
                   {
                     this.state.currentPage === "reminders" &&
-                      <Reminders reminders = {this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder}/>
+                      <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
                   }
                   {
                     this.state.currentPage === "babyInfo" &&

@@ -1,6 +1,7 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat'
+import { StyleSheet, Text, View, Dimensions, TextInput, Button, ScrollView} from 'react-native';
+import {firebase, firestore} from '../utils/firebase';
+
 
 export default class Messages extends Component {
     constructor(props) {
@@ -11,80 +12,120 @@ export default class Messages extends Component {
             msgs: [],
         };
 
-        firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user.uid : this.props.oppositeUser)
-            .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUser : this.props.user.uid)
-            .onSnapshot(doc => {
-                let dataObj = doc.data().messages;
-                
-                let msgs = dataObj.map(key => {
-                    return {
-                        sentBy: key.sentBy,
-                        text: key.text,
-                        time: key.time
-                    }
-                })
+        this.all = firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
+        .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user);
         
-                /*
-                [
-                {name: 'danny', txt: 'hi'}
-                {name: 'john', txt: 'bye'},
-                ]
-                */
-        
-                this.setState({msgs})
+        console.log(this.props.oppositeUserUID);
+
+        this.all.onSnapshot(doc => {
+            let dataObj = doc.data().messages;
+            
+
+            let msgs = dataObj.map(key => {
+                return {
+                    sentBy: key.sentBy,
+                    text: key.text,
+                    time: key.time,
+                    textInput: ""
+                }
+            })
+    
+            /*
+            [
+            {name: 'danny', txt: 'hi'}
+            {name: 'john', txt: 'bye'},
+            ]
+            */
+    
+            this.setState({msgs})
+            
         });
+        this.addMessage = this.addMessage.bind(this);
     };
 
-    
+    addMessage() {
+        if (this.state.textInput === "") {
+            return;
+        }
+        let ar = this.state.msgs;
+        let date = new Date().getTime();
+
+        console.log(ar);
+
+        ar.push({
+            "sentBy": this.props.accountType === "parent" ? true : false,
+            "text": this.state.textInput,
+            "time": date
+        })
+
+        console.log(ar);
+
+        firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
+        .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user).update({
+            "messages": ar
+        })
+    }
 
     render() {
         return (
-            <View style={styles.container}>
-                {
-                this.state.msgs.map((m,i) => {
+            <ScrollView ref={scroll => { this.scroll1 = scroll }}>
+                <View style={{flexDirection: "column"}}>
+                    <View style = {styles.container}>
+                        {
+                        this.state.msgs.map((m,i) => {
 
-                    let nameView = <View style={{width: Dimensions.get('window').width/10, backgroundColor: 'gray'}}>
-                                    <Text >{m.sentBy}</Text>
+                            return (
+                            <View>
+
+                                {(m.sentBy && this.props.accountType != "parent" || (!m.sentBy && this.props.accountType == "parent")) && 
+                                    <View >
+                                        <Text style={styles.other}>{m.text}</Text>
                                     </View>
+                                }
+                                
 
-                    return (
-                    <View style={{
-                        opacity: this.state.opacity
-                    }} key={m.time}>
-                    
-                        {sentBy==this.props.user.uid && nameView}
-
-                        <View style={{flex:1}}>
-                            <Text>{m.text}</Text>
-                        </View>
-
-                        {sentBy!=this.props.user.uid && nameView}
+                                {(m.sentBy && this.props.accountType === "parent" || (!m.sentBy && this.props.accountType != "parent")) && 
+                                    <View >
+                                        <Text style={styles.self}>{m.text}</Text>
+                                    </View>
+                                }
+                            </View>
+                            )
+                        })
+                        }
                     </View>
-                    )
-                })
-                }
-            </View>
+
+                    <View style={{alignSelf:"flex-end"}}>
+                        <TextInput ref={input => { this.textInput = input }} value={this.state.textInput} onChangeText={a => this.setState({textInput: a})}/>
+                        <Button title={"Submit"} onPress={() => {
+                            this.textInput.clear();
+                            this.addMessage();
+                        }} />
+                    </View>
+                </View>
+            </ScrollView>
         );
     };
 };
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      flexBasis: 0,
-      backgroundColor: '#fff',
-      alignItems: 'stretch',
-      justifyContent: 'center',
-      borderBottomColor: 'red',
-      borderBottomWidth: 2,
-      marginTop: Constants.statusBarHeight
+        alignItems: 'stretch',
+        zIndex: 10
     },
-    row: {
-      flexDirection: 'row',
-      flex: 1,
-      borderBottomColor: 'gray',
-      borderBottomWidth: 1,
+    self: {
+        flexDirection: 'row',
+        alignSelf: "flex-end",
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
     },
-    rowOdd: {},
-    rowEven: {}
-  });
+    other: {
+        flexDirection: 'row',
+        alignSelf: "flex-start",
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
+    },
+
+
+
+});

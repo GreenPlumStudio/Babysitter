@@ -33,6 +33,7 @@ export default class App extends React.Component {
     super();
 
     this.state = {
+      isLoading: true,
       user: undefined,
       userUID: "",
       // loading: true,
@@ -161,9 +162,9 @@ export default class App extends React.Component {
     // SideMenu
     this.halfWidth = Dimensions.get("window").width * 0.5;
 
-    // setTimeout(()=>{
-    //   this.showSideMenu();
-    // }, 1000);
+    setTimeout(()=>{
+      this.setState({isLoading: false});
+    }, 4000);
   };
 
   fetchReminders() {
@@ -420,154 +421,164 @@ export default class App extends React.Component {
   };
 
   render() {
-    let user = this.state.user;
-    let isAccountTypeParent = this.state.accountType === "parent";
-    let hasOppositeUsers = this.state.oppositeUsers.length > 0;
-    
-    return (
-      <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
-        {
-          !user && this.state.accountType === "" &&
-            <WelcomePage changeAccountType={this.changeAccountType} />
-        }
-        {
-          !user && this.state.accountType !== "" &&
-            <LoginSignupPage backToChooseAccountType={this.backToChooseAccountType} accountType={this.state.accountType} loginOrSignup={this.state.loginOrSignup} setLoginOrSignup={this.setLoginOrSignup} />
-        }
 
-        {
-          user &&
-          <View style={{flex: 1}}>
-            {/* Side Menu~ */}
-            <Animated.View style={{
-              backgroundColor: "white",
-              width: this.halfWidth * 1.4,
-              height: Dimensions.get("window").height,
-              position: "absolute",
-              left: -this.halfWidth * 1.4,
-              top: 0,
-              zIndex: 3,
-              transform: [
-                {
-                  translateX: this.state.percent.interpolate({
-                    inputRange: [ 0, 1 ],
-                    outputRange: [ 0, this.halfWidth * 1.4 ]
-                  })
-                }
-              ]
-            }}>
-              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} />
-            </Animated.View>
+    if (this.state.isLoading === true) {
+      return (
+        <View style={{marginTop: Constants.statusBarHeight}}>
+          <Text>Loading...</Text>
+        </View>
+      )
+    }
+    else {
+      let user = this.state.user;
+      let isAccountTypeParent = this.state.accountType === "parent";
+      let hasOppositeUsers = this.state.oppositeUsers.length > 0;
+      
+      return (
+        <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
+          {
+            !user && this.state.accountType === "" &&
+              <WelcomePage changeAccountType={this.changeAccountType} />
+          }
+          {
+            !user && this.state.accountType !== "" &&
+              <LoginSignupPage backToChooseAccountType={this.backToChooseAccountType} accountType={this.state.accountType} loginOrSignup={this.state.loginOrSignup} setLoginOrSignup={this.setLoginOrSignup} />
+          }
 
-            {
-              this.state.grayout &&
-                <TouchableOpacity style={{
-                    backgroundColor: "gray",
-                    width: this.halfWidth * 2,
-                    height: Dimensions.get("window").height,
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    zIndex: 2,
-                    opacity: 0.4
-                  }}
-                  onPress={this.hideSideMenu}
-                />
-            }
-            {/* ~Side Menu */}
-            
-            {/* Top Menu Bar~ */}
-            <ImageBackground source={require("./assets/topMenuBarBackground.png")} style={{height: hasOppositeUsers ? 85 : 55, zIndex: 0}}>
-              <View>
-                <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
-                  <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require("./assets/hamburgerMenuIcon.png")} />
-                </TouchableOpacity>
-
-                <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20, color: "#f8f8ff"}}>
+          {
+            user &&
+            <View style={{flex: 1}}>
+              {/* Side Menu~ */}
+              <Animated.View style={{
+                backgroundColor: "white",
+                width: this.halfWidth * 1.4,
+                height: Dimensions.get("window").height,
+                position: "absolute",
+                left: -this.halfWidth * 1.4,
+                top: 0,
+                zIndex: 3,
+                transform: [
                   {
-                    this.state.oppositeUsers.length == 0 &&
-                    "Please add a " + (this.state.accountType === "parent" ? "Babysitter" : "Parent")
+                    translateX: this.state.percent.interpolate({
+                      inputRange: [ 0, 1 ],
+                      outputRange: [ 0, this.halfWidth * 1.4 ]
+                    })
                   }
-                  {
-                    this.state.oppositeUsers.length > 0 &&
-                    this.state.oppositeUser.firstName + " " + this.state.oppositeUser.lastName
-                  }
-                </Text>
+                ]
+              }}>
+                <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} />
+              </Animated.View>
 
-                <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
-                  <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require("./assets/antMenuIcon.png")} />
-                </TouchableOpacity>
-              </View>
+              {
+                this.state.grayout &&
+                  <TouchableOpacity style={{
+                      backgroundColor: "gray",
+                      width: this.halfWidth * 2,
+                      height: Dimensions.get("window").height,
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
+                      zIndex: 2,
+                      opacity: 0.4
+                    }}
+                    onPress={this.hideSideMenu}
+                  />
+              }
+              {/* ~Side Menu */}
               
+              {/* Top Menu Bar~ */}
+              <ImageBackground source={require("./assets/topMenuBarBackground.png")} style={{height: hasOppositeUsers ? 85 : 55, zIndex: 0}}>
+                <View>
+                  <TouchableOpacity style={{position: "absolute", top: 15}} onPress={this.showSideMenu}>
+                    <Image style={{resizeMode: "contain", maxHeight: 30, left: -30}} source={require("./assets/hamburgerMenuIcon.png")} />
+                  </TouchableOpacity>
+
+                  <Text style={{position: "absolute", top: 15, left: 70, fontWeight: "500", fontSize: 20, color: "#f8f8ff"}}>
+                    {
+                      this.state.oppositeUsers.length == 0 &&
+                      "Please add a " + (this.state.accountType === "parent" ? "Babysitter" : "Parent")
+                    }
+                    {
+                      this.state.oppositeUsers.length > 0 &&
+                      this.state.oppositeUser.firstName + " " + this.state.oppositeUser.lastName
+                    }
+                  </Text>
+
+                  <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
+                    <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require("./assets/antMenuIcon.png")} />
+                  </TouchableOpacity>
+                </View>
+                
+                {
+                  hasOppositeUsers &&
+                  <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
+                }
+              </ImageBackground>
+              {/* ~Top Menu Bar */}
+
+              {
+                !hasOppositeUsers &&
+                <View style={{zIndex: 0}}>
+                  <View>
+                    <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
+
+                    <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " Username"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
+                    <Text>{this.state.errMsg}</Text>
+                    <Button title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
+                  </View>
+                </View>
+              }
+
               {
                 hasOppositeUsers &&
-                <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
+                <View style={{flex: 1, zIndex: 0}}>
+                  <View>
+                    {
+                      this.state.currentPage === "messages" &&
+                        <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                    }
+                    {
+                      this.state.currentPage === "reminders" &&
+                        <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
+                    }
+                    {
+                      this.state.currentPage === "babyInfo" &&
+                        <BabyInfo user={this.state.userUID} />
+                    }
+                  </View>
+                </View>
               }
-            </ImageBackground>
-            {/* ~Top Menu Bar */}
 
-            {
-              !hasOppositeUsers &&
-              <View style={{zIndex: 0}}>
-                <View>
-                  <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
-
-                  <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " Username"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
-                  <Text>{this.state.errMsg}</Text>
-                  <Button style={{zIndex: 1}} title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
+              <PopupDialog
+                overlayBackgroundColor={'green'}
+                height={0.6}
+                dialogAnimation={addBabysitterPopup}
+                ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
+                dialogTitle={<DialogTitle title={this.state.accountType === "parent" ? "Add a Babysitter" : "Add a Parent"} />}
+              >
+                <View style={{zIndex:1}}>
+                  <AddBabysitterModal accountType={this.state.accountType} addParent={this.addParent} addBabysitter={this.addBabysitter} />
                 </View>
-              </View>
-            }
+              </PopupDialog>
 
-            {
-              hasOppositeUsers &&
-              <View style={{flex: 1, zIndex: 0}}>
-                <View>
-                  {
-                    this.state.currentPage === "messages" &&
-                      <Messages user={user} accountType={this.state.accountType} oppositeUser={this.state.oppositeUser} />
-                  }
-                  {
-                    this.state.currentPage === "reminders" &&
-                      <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
-                  }
-                  {
-                    this.state.currentPage === "babyInfo" &&
-                      <BabyInfo user={user} />
-                  }
+              <PopupDialog
+                overlayBackgroundColor={'green'}
+                height={0.6}
+                dialogAnimation={addReminderPopup}
+                ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}
+                dialogTitle={<DialogTitle title="Add Reminder" />}
+              >
+                <View style={{zIndex:1}}>
+                  <ReminderModal addReminder={this.addReminder}/>
                 </View>
-              </View>
-            }
+              </PopupDialog>
 
-            <PopupDialog
-              overlayBackgroundColor={'green'}
-              height={0.6}
-              dialogAnimation={addBabysitterPopup}
-              ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
-              dialogTitle={<DialogTitle title={this.state.accountType === "parent" ? "Add a Babysitter" : "Add a Parent"} />}
-            >
-              <View style={{zIndex:1}}>
-                <AddBabysitterModal accountType={this.state.accountType} addParent={this.addParent} addBabysitter={this.addBabysitter} />
-              </View>
-            </PopupDialog>
-
-            <PopupDialog
-              overlayBackgroundColor={'green'}
-              height={0.6}
-              dialogAnimation={addReminderPopup}
-              ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}
-              dialogTitle={<DialogTitle title="Add Reminder" />}
-            >
-              <View style={{zIndex:1}}>
-                <ReminderModal addReminder={this.addReminder}/>
-              </View>
-            </PopupDialog>
-
-          </View>
-        }
-      </View>
-    );
-  };
+            </View>
+          }
+        </View>
+      );
+    };
+  }
 };
 
 const styles = StyleSheet.create({

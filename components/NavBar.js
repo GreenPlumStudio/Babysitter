@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
         maxHeight: 30,
         marginBottom: 5,
         elevation: 3,
-        backgroundColor: "white",
-        zIndex: 0
+        zIndex: 0,
+        top: 55
     },
   
     navButton: {
@@ -46,17 +46,18 @@ const styles = StyleSheet.create({
   
     navButtonPressed: {
         borderBottomWidth: 2,
-        borderBottomColor: "#007BA7",
+        borderBottomColor: "#f8f8ff",
         width: Dimensions.get("window").width / 3
     },
   
     navButtonLabel: {
+        color: "#f5f5f5",
         fontWeight: "bold",
         textAlign: "center"
     },
     
     navButtonPressedLabel: {
-        color: "#007BA7",
+        color: "#f8f8ff",
         fontWeight: "bold",
         textAlign: "center"
     }

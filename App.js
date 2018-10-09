@@ -456,7 +456,7 @@ export default class App extends React.Component {
                 }
               ]
             }}>
-              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} />
+              <SideMenuItems signOut={this.signOut} openPopupDialog={this.openAddBabysitterPopup} user={this.state.user} username={this.state.user.username} accountType={this.state.accountType} oppositeUsers={this.state.oppositeUsers} switchCurOppositeUser={this.switchCurOppositeUser} sideMenuWidth={this.halfWidth * 1.4} />
             </Animated.View>
 
             {
@@ -540,7 +540,7 @@ export default class App extends React.Component {
             }
 
             <PopupDialog
-              overlayBackgroundColor={'green'}
+              overlayBackgroundColor={"lightblue"}
               height={0.6}
               dialogAnimation={addBabysitterPopup}
               ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
@@ -552,7 +552,7 @@ export default class App extends React.Component {
             </PopupDialog>
 
             <PopupDialog
-              overlayBackgroundColor={'green'}
+              overlayBackgroundColor={"lightblue"}
               height={0.6}
               dialogAnimation={addReminderPopup}
               ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}

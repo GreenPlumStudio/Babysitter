@@ -14,8 +14,6 @@ export default class Messages extends Component {
 
         this.all = firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user);
-        
-        console.log(this.props.oppositeUserUID);
 
         this.all.onSnapshot(doc => {
             let dataObj = doc.data().messages;

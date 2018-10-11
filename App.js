@@ -423,7 +423,9 @@ export default class App extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <View>is Loading</View>
+        <View>
+          <Text>is Loading</Text>
+        </View>
       )
     } else {
       let user = this.state.user;
@@ -531,7 +533,7 @@ export default class App extends React.Component {
                   <View>
                     {
                       this.state.currentPage === "messages" &&
-                        <Messages user={user} />
+                      <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
                     }
                     {
                       this.state.currentPage === "reminders" &&
@@ -539,7 +541,7 @@ export default class App extends React.Component {
                     }
                     {
                       this.state.currentPage === "babyInfo" &&
-                        <BabyInfo user={user} />
+                        <BabyInfo user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
                     }
                   </View>
                 </View>

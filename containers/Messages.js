@@ -9,17 +9,16 @@ export default class Messages extends Component {
 
         this.state = {
             user: this.props.user,
-            msgs: [],
+            msgs: []
         };
 
         this.all = firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user);
-
+        
         this.all.onSnapshot(doc => {
             let dataObj = doc.data().messages;
             
-
-            let msgs = dataObj.map(key => {
+             let msgs = dataObj.map(key => {
                 return {
                     sentBy: key.sentBy,
                     text: key.text,
@@ -38,8 +37,11 @@ export default class Messages extends Component {
             this.setState({msgs})
             
         });
+
         this.addMessage = this.addMessage.bind(this);
+
     };
+
 
     addMessage() {
         if (this.state.textInput === "") {
@@ -62,6 +64,8 @@ export default class Messages extends Component {
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user).update({
             "messages": ar
         })
+
+        this.setState({textInput: ""});
     }
 
     render() {
@@ -123,7 +127,4 @@ const styles = StyleSheet.create({
         borderBottomColor: 'gray',
         borderBottomWidth: 1,
     },
-
-
-
 });

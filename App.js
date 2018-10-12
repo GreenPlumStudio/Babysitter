@@ -57,7 +57,7 @@ export default class App extends React.Component {
       grayout: false
     };
 
-    this.componentWillMount = this.componentWillMount.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
     this.changeAccountType = this.changeAccountType.bind(this);
     this.signOut = this.signOut.bind(this);
     this.backToChooseAccountType = this.backToChooseAccountType.bind(this);
@@ -81,7 +81,7 @@ export default class App extends React.Component {
     this.setState({reminders: newProps.reminders});
   };
 
-  componentWillMount() {
+  componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         firestore.collection("parentUsers").doc(user.uid).get().then( parentUserDoc => {
@@ -277,7 +277,7 @@ export default class App extends React.Component {
         firestore.collection("parentUsers").doc(userUID).collection("babysitters").doc(babysitterUID).set({
           "messages": [],
           "reminders": [],
-          "babyInfo": {},
+          "babyInfo": [],
           "email": babysitterDocData.email,
           "username": babysitterUsername,
           "firstName": babysitterDocData.firstName,

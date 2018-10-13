@@ -1,5 +1,5 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View, Button, TextInput, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, ScrollView, Alert} from 'react-native';
 import {firebase, firestore} from '../utils/firebase';
 
 export default class BabyInfo extends Component {
@@ -153,7 +153,7 @@ export default class BabyInfo extends Component {
                         <Text>Likes: </Text><TextInput value={this.state.likes} onChangeText={(a) => {this.setState({likes: a})}}/>
                         <Button title={"X"} onPress={() => {this.setState({likes: ""})}} />
 
-                        <Text>Diseases: </Text><TextInput value={this.state.dislikes} onChangeText={(a) => {this.setState({dislikes: a})}}/>
+                        <Text>Dislikes: </Text><TextInput value={this.state.dislikes} onChangeText={(a) => {this.setState({dislikes: a})}}/>
                         <Button title={"X"} onPress={() => {this.setState({dislikes: ""})}} />
 
                         <Text>Additional Information: </Text><TextInput value={this.state.additionalInfo} onChangeText={(a) => {this.setState({additionalInfo: a})}}/>
@@ -161,8 +161,18 @@ export default class BabyInfo extends Component {
 
 
                         <Button title={"Save Changes"} onPress={() => {
-                            alert("hi");
-                             this.editBabyInfo()
+                            Alert.alert(
+                                'Confirmation',
+                                'Are you sure you want to save your changes?',
+                                [
+                                    {text: 'Cancel'},
+                                    {text: 'Yes', onPress: () => {
+                                        this.setState({currentPage: "home"});
+                                        this.editBabyInfo();
+                                    }},
+                                  
+                                ],
+                            )
                         }} />
                     </View>
                 </ScrollView>

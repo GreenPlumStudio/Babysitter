@@ -164,7 +164,7 @@ export default class App extends React.Component {
 
     setTimeout(()=>{
       this.setState({isLoading: false});
-    }, 4000);
+    }, 3000);
   };
 
   fetchReminders() {
@@ -380,6 +380,7 @@ export default class App extends React.Component {
         this.hideSideMenu();
       });
     });
+
   };
   
   backToChooseAccountType() {

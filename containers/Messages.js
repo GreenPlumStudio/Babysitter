@@ -75,9 +75,8 @@ export default class Messages extends Component {
                     <View style = {styles.container}>
                         {
                         this.state.msgs.map((m,i) => {
-
                             return (
-                            <View>
+                            <View key={i}>
 
                                 {(m.sentBy && this.props.accountType != "parent" || (!m.sentBy && this.props.accountType == "parent")) && 
                                     <View >

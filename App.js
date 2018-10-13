@@ -3,6 +3,9 @@ import { StyleSheet, Text, View, Button, Dimensions, TextInput, TouchableOpacity
 import { firebase, firestore } from './utils/firebase';
 import { Constants } from 'expo';
 
+import PopupDialog, { ScaleAnimation, DialogButton, DialogTitle} from 'react-native-popup-dialog';
+import Spinner from 'react-native-loading-spinner-overlay';
+
 import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
 import BabyInfo from './containers/BabyInfo';
@@ -10,9 +13,7 @@ import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './containers/LoginSignupPage';
 import NavBar from './components/NavBar';
 import SideMenuItems from './components/SideMenuItems';
-
 import ReminderModal from './components/ReminderModal';
-import PopupDialog, { ScaleAnimation, DialogButton, DialogTitle} from 'react-native-popup-dialog';
 import AddBabysitterModal from './components/AddBabysitterModal';
 
 // Ignore Warning
@@ -378,9 +379,11 @@ export default class App extends React.Component {
         });
         this.fetchReminders();
         this.hideSideMenu();
+
+        this.changeCurrentPage("reminders");
+        this.changeCurrentPage("messages");
       });
     });
-
   };
   
   backToChooseAccountType() {
@@ -424,8 +427,8 @@ export default class App extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <View>
-          <Text>is Loading</Text>
+        <View style={{flex: 1, justifyContent: "center", alignItems: "center", marginTop: Constants.statusBarHeight}}>
+          <Spinner visible={true} animation="fade" overlayColor="#2657a5" />
         </View>
       )
     } else {

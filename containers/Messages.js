@@ -56,17 +56,17 @@ export default class Messages extends Component {
             "sentBy": this.props.accountType === "parent" ? true : false,
             "text": this.state.textInput,
             "time": date
-        })
+        });
 
         console.log(ar);
 
         firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user).update({
             "messages": ar
-        })
+        });
 
         this.setState({textInput: ""});
-    }
+    };
 
     render() {
         return (

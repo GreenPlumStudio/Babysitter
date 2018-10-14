@@ -1,8 +1,7 @@
 import React, { Component } from 'React';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import ReminderCell from './ReminderCell';
-import { firebase, firestore } from '../utils/firebase';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Feather';
 import { Constants } from 'expo';
 
 export default class Reminders extends Component {
@@ -50,7 +49,26 @@ export default class Reminders extends Component {
                 {
                     this.props.accountType === "parent" &&
                     <TouchableOpacity style={styles.addReminderIcon} onPress={() => this.props.popupDialog()}>
-                        <Icon name={"add-circle"} size={55} color="#01a699" />
+                        <Icon name={"plus"} style={{
+                            position: "absolute",
+                            elevation:13
+                        }} size={28} color="white" />
+
+                        <View style={{
+                            backgroundColor: "red",
+                            borderRadius: 27.5,
+                            // shadowOpacity: 1,
+                            // shadowRadius: 10,
+                            // shadowOffset: {width: 10,height: 10},
+                            // shadowColor: "gray",
+                            elevation: 6,
+                            width: 50,
+                            height: 50,
+                            position: "absolute",
+                            zIndex: 1,
+                            overflow: "visible"
+                        }} />
+                        
                     </TouchableOpacity>
                 }
             </View>
@@ -61,13 +79,12 @@ export default class Reminders extends Component {
 const styles = StyleSheet.create({
     addReminderIcon: {
         position: "absolute",
-        bottom: 22,
-        right: 14,
+        bottom: 15,
+        right: 9,
         alignItems: "center",
         justifyContent: "center",
-        width: 65,
-        height: 65,
-        zIndex: 1,
-        elevation: 5
+        width: 70,
+        height: 70,
+        zIndex: 1
     }
 });

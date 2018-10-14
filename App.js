@@ -223,7 +223,7 @@ export default class App extends React.Component {
 
     setTimeout(()=>{
       this.setState({isLoading: false});
-    }, 4000);
+    }, 2500);
   };
 
   fetchMessages() {

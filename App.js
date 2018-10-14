@@ -89,6 +89,7 @@ export default class App extends React.Component {
     this.addBabysitter = this.addBabysitter.bind(this);
     this.addParent = this.addParent.bind(this);
     this.switchCurOppositeUser = this.switchCurOppositeUser.bind(this);
+    this.fetchMessages = this.fetchMessages.bind(this);
     this.fetchReminders = this.fetchReminders.bind(this);
 
     // SideMenu
@@ -153,17 +154,8 @@ export default class App extends React.Component {
               })
 
               this.all.onSnapshot( doc => {
-                let dataObj = doc.data().messages;
-                
-                let msgs = dataObj.map( key => {
-                    return {
-                        sentBy: key.sentBy,
-                        text: key.text,
-                        time: key.time,
-                        textInput: ""
-                    };
-                });
-                this.setState({msgs});  
+                let msgs = doc.data().messages;
+                this.setState({msgs});
                 this.setState({opacity: 5}); 
               });
             })
@@ -215,17 +207,9 @@ export default class App extends React.Component {
                 })
   
                 this.all.onSnapshot( doc => {
-                  let dataObj = doc.data().messages;
-                  
-                  let msgs = dataObj.map( key => {
-                      return {
-                          sentBy: key.sentBy,
-                          text: key.text,
-                          time: key.time,
-                          textInput: ""
-                      };
-                  });
-                  this.setState({msgs});   
+                  let msgs = doc.data().messages;
+                  this.setState({msgs});
+                  this.setState({opacity: 5});
                 });
               })
             });
@@ -242,11 +226,18 @@ export default class App extends React.Component {
     }, 4000);
   };
 
+  fetchMessages() {
+    let isAccountTypeParent = this.state.accountType === "parent";
+    firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
+      this.setState({msgs: doc.data().messages});
+    });
+  };
+
   fetchReminders() {
     let isAccountTypeParent = this.state.accountType === "parent";
     firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
       this.setState({reminders: doc.data().reminders});
-    })
+    });
   };
 
   changeAccountType(accountType) {
@@ -480,6 +471,7 @@ export default class App extends React.Component {
           oppositeUser: oppositeUserDoc.data(),
           oppositeUserUID
         });
+        this.fetchMessages();
         this.fetchReminders();
         this.hideSideMenu();
 
@@ -501,7 +493,7 @@ export default class App extends React.Component {
   showSideMenu() {
     Animated.timing(this.state.percent, {
       toValue: 1,
-      duration: 130,
+      duration: 200,
       easing: Easing.ease
     }).start();
 
@@ -513,7 +505,7 @@ export default class App extends React.Component {
   hideSideMenu() {
 		Animated.timing(this.state.percent, {
 			toValue: 0,
-			duration: 130,
+			duration: 200,
 			easing: Easing.ease
 		}).start();
 

@@ -35,7 +35,7 @@ export default class ReminderCell extends Component {
                             }
                         ]
                     );
-
+                    console.log(this.state.isDeleting);
                     this.setState({isDeleting: false});
                 }}>
                     <Icon name={this.state.isDeleting ? "delete-empty" : "delete"} size={30}/>

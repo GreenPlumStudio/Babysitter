@@ -49,7 +49,7 @@ export default class Messages extends Component {
     };
 
     scrollToEnd() {
-        this.msgsScrollView.scrollToEnd({animated: false});
+        this.msgsScrollView.scrollToEnd();
     };
 
     addMessage() {

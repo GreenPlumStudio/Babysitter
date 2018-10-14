@@ -32,6 +32,12 @@ export default class Reminders extends Component {
         return (
             <View style={{height: Dimensions.get('window').height - Constants.statusBarHeight - 85}}>
                 {
+                    this.state.reminders.length == 0 &&
+                    <View style={{height: Dimensions.get("window").height - Constants.statusBarHeight - 85, justifyContent: "center", alignItems: "center"}}>
+                        <Text style={{fontSize: 25, fontWeight: "400"}}>No current reminders!</Text>
+                    </View>
+                }
+                {
                     this.state.reminders &&
                     <ScrollView contentContainerStyle={{padding: 10}}>
                         {

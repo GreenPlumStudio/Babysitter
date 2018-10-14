@@ -11,36 +11,12 @@ export default class Messages extends Component {
 
         this.state = {
             user: this.props.user,
-            msgs: [],
             textInput: "",
             isEditingMsg: false
         };
 
         this.all = firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user);
-        
-        this.all.onSnapshot( doc => {
-            let dataObj = doc.data().messages;
-            
-            let msgs = dataObj.map( key => {
-                return {
-                    sentBy: key.sentBy,
-                    text: key.text,
-                    time: key.time,
-                    textInput: ""
-                };
-            });
-    
-            /*
-                [
-                    {name: 'danny', txt: 'hi'},
-                    {name: 'john', txt: 'bye'}
-                ]
-            */
-    
-            this.setState({msgs});
-            
-        });
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
@@ -51,8 +27,8 @@ export default class Messages extends Component {
 
     componentDidMount() {
         setTimeout(() => {
-            this.scrollToEnd();
-        }, 500);
+            this.scrollToEnd({animated: true});
+        }, 1);
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
     };
@@ -78,7 +54,7 @@ export default class Messages extends Component {
         if (this.state.textInput === "") {
             return;
         }
-        let ar = this.state.msgs;
+        let ar = this.props.msgs;
         let date = new Date().getTime();
 
         ar.push({
@@ -102,7 +78,7 @@ export default class Messages extends Component {
                 <View style={{height: msgsPgHeight - 50, backgroundColor: "red"}}>
                     <ScrollView ref={ msgsScrollView => { this.msgsScrollView = msgsScrollView } } /*contentContainerStyle={this.state.isEditingMsg ? styles.msgsScrollViewOnEditing : styles.msgsScrollView}*/>
                         {
-                            this.state.msgs.map( (m, i) => {
+                            this.props.msgs.map( (m, i) => {
                                 if (m.sentBy && this.props.accountType !== "babysitter" || !m.sentBy && this.props.accountType !== "parent") {
                                     return (
                                         <View key={i}>

@@ -40,7 +40,7 @@ export default class App extends React.Component {
       // loading: true,
       accountType: "",
       loginOrSignup: "login",
-      currentPage: "messages",
+      currentPage: "",
       parentUsername: "",
       parentUID: "",
       babysitterUsername: "",
@@ -60,7 +60,10 @@ export default class App extends React.Component {
 
       // babyInfo
 
-      info: {}
+      info: {},
+
+      // messages:
+      msgs: []
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -138,6 +141,22 @@ export default class App extends React.Component {
               .catch(err => {
                 console.log(err);
               })
+
+              this.all.onSnapshot( doc => {
+                let dataObj = doc.data().messages;
+                
+                let msgs = dataObj.map( key => {
+                    return {
+                        sentBy: key.sentBy,
+                        text: key.text,
+                        time: key.time,
+                        textInput: ""
+                    };
+                });
+                this.setState({msgs});   
+              });
+
+              this.setState({currentPage: "messages"});
             })
           }
           // if babysitter
@@ -288,7 +307,7 @@ export default class App extends React.Component {
             additionalInfo: additionalInfo,
         }
     }).then(() => {
-      this.setState({currentPage: "messages"});
+      this.setState({currentPage: "reminders"});
       this.setState({currentPage: "babyInfo"});
       this.setState({isLoading: false});
     }).catch(err => {
@@ -577,7 +596,7 @@ export default class App extends React.Component {
                 <View style={{flex: 1, zIndex: 0, height: Dimensions.get("window").height - 85}}>
                   {
                     this.state.currentPage === "messages" &&
-                    <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                    <Messages msgs={this.state.msgs} user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
                   }
                   {
                     this.state.currentPage === "reminders" &&
@@ -585,7 +604,7 @@ export default class App extends React.Component {
                   }
                   {
                     this.state.currentPage === "babyInfo" &&
-                      <BabyInfo info={this.state.info} editBabyInfo={this.editBabyInfo} accountType={this.state.accountType} />
+                    <BabyInfo info={this.state.info} editBabyInfo={this.editBabyInfo} accountType={this.state.accountType} />
                   }
                 </View>
               }

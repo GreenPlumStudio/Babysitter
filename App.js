@@ -574,7 +574,7 @@ export default class App extends React.Component {
 
               {
                 hasOppositeUsers &&
-                <View style={{flex: 1, zIndex: 0}}>
+                <View style={{flex: 1, zIndex: 0, height: Dimensions.get("window").height - 85}}>
                   {
                     this.state.currentPage === "messages" &&
                     <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />

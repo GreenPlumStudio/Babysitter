@@ -1,7 +1,9 @@
 import React, { Component } from 'React';
 import { StyleSheet, Text, View, Dimensions, TextInput, Button, ScrollView, Keyboard } from 'react-native';
 import { firebase, firestore } from '../utils/firebase';
+import { Constants } from 'expo';
 
+const msgsPgHeight = Dimensions.get("window").height - Constants.statusBarHeight - 85;
 
 export default class Messages extends Component {
     constructor(props) {
@@ -124,30 +126,32 @@ export default class Messages extends Component {
 
 const styles = StyleSheet.create({
     msgsPgView: {
-        height: Dimensions.get("window").height - 85,
-        backgroundColor: "green"
+        height: msgsPgHeight,
+        backgroundColor: "green",
+        flex: 1
     },
 
     msgsPgViewOnEditing: {
-        height: Dimensions.get("window").height - 85,
+        height: msgsPgHeight,
         paddingBottom: 20,
-        backgroundColor: "green"
+        backgroundColor: "green",
+        flex: 1
     },
 
     msgsScrollView: {
-        height: Dimensions.get("window").height - 135,
+        height: msgsPgHeight - 100,
         backgroundColor: "red"
     },
 
     msgsScrollViewOnEditing: {
-        height: Dimensions.get("window").height - 235,
+        height: msgsPgHeight - 200,
         backgroundColor: "red"
     },
 
     sendMsgBar: {
         flex: 1,
         flexDirection: "row",
-        height: 50,
+        height: 100,
         zIndex: 1,
         elevation: 4,
         backgroundColor: "purple"

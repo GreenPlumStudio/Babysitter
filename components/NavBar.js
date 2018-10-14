@@ -5,7 +5,7 @@ const NavBar = (props) => {
     let currentPage = props.currentPage;
 
     return (
-        <View style={styles.navBar}>
+        <View style={[styles.navBar, {opacity: props.opacity}]}>
             <TouchableOpacity style={currentPage === "messages" ? styles.navButtonPressed : styles.navButton} onPress={() => {props.changeCurrentPage("messages")}}>
                 <Text style={currentPage === "messages" ? styles.navButtonPressedLabel : styles.navButtonLabel}>
                     MESSAGES
@@ -37,8 +37,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         elevation: 3,
         zIndex: 0,
-        top: 55,
-        opacity: this.props.opacity
+        top: 55
     },
   
     navButton: {

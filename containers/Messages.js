@@ -42,14 +42,17 @@ export default class Messages extends Component {
             
         });
 
+        this.componentDidMount = this.componentDidMount.bind(this);
         this._keyboardDidShow = this._keyboardDidShow.bind(this);
         this._keyboardDidHide = this._keyboardDidHide.bind(this);
-
+        this.scrollToEnd = this.scrollToEnd.bind(this);
         this.addMessage = this.addMessage.bind(this);
     };
 
     componentDidMount() {
-        this.msgsScrollView.scrollToEnd({animated: false});
+        setTimeout(() => {
+            this.scrollToEnd();
+        }, 500);
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
     };
@@ -65,6 +68,10 @@ export default class Messages extends Component {
     
     _keyboardDidHide() {
         this.setState({isEditingMsg: false});
+    };
+
+    scrollToEnd() {
+        this.msgsScrollView.scrollToEnd({animated: false});
     };
 
     addMessage() {
@@ -83,33 +90,36 @@ export default class Messages extends Component {
         firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
         .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user).update({
             "messages": ar
+        }).then(() => {
+            this.setState({textInput: ""});
+            this.scrollToEnd();
         });
-
-        this.setState({textInput: ""});
     };
 
     render() {
         return (
             <View style={this.state.isEditingMsg ? styles.msgsPgViewOnEditing : styles.msgsPgView}>
-                <ScrollView ref={ msgsScrollView => { this.msgsScrollView = msgsScrollView } } contentContainerStyle={this.state.isEditingMsg ? styles.msgsScrollViewOnEditing : styles.msgsScrollView}>
-                    {
-                        this.state.msgs.map( (m, i) => {
-                            if (m.sentBy && this.props.accountType !== "babysitter" || !m.sentBy && this.props.accountType !== "parent") {
-                                return (
-                                    <View key={i}>
-                                        <Text style={styles.self}>{m.text}</Text>
-                                    </View>
-                                );
-                            } else {
-                                return (
-                                    <View key={i}>
-                                        <Text style={styles.other}>{m.text}</Text>
-                                    </View>
-                                );
-                            }
-                        })
-                    }
-                </ScrollView>
+                <View style={{height: msgsPgHeight - 50, backgroundColor: "red"}}>
+                    <ScrollView ref={ msgsScrollView => { this.msgsScrollView = msgsScrollView } } /*contentContainerStyle={this.state.isEditingMsg ? styles.msgsScrollViewOnEditing : styles.msgsScrollView}*/>
+                        {
+                            this.state.msgs.map( (m, i) => {
+                                if (m.sentBy && this.props.accountType !== "babysitter" || !m.sentBy && this.props.accountType !== "parent") {
+                                    return (
+                                        <View key={i}>
+                                            <Text style={styles.self}>{m.text}</Text>
+                                        </View>
+                                    );
+                                } else {
+                                    return (
+                                        <View key={i}>
+                                            <Text style={styles.other}>{m.text}</Text>
+                                        </View>
+                                    );
+                                }
+                            })
+                        }
+                    </ScrollView>
+                </View>
                 
                 { /* Send msg bar */ }
                 <View style={styles.sendMsgBar}>
@@ -139,19 +149,19 @@ const styles = StyleSheet.create({
     },
 
     msgsScrollView: {
-        height: msgsPgHeight - 100,
+        height: msgsPgHeight - 50,
         backgroundColor: "red"
     },
 
     msgsScrollViewOnEditing: {
-        height: msgsPgHeight - 200,
+        height: msgsPgHeight - 150,
         backgroundColor: "red"
     },
 
     sendMsgBar: {
         flex: 1,
         flexDirection: "row",
-        height: 100,
+        height: 50,
         zIndex: 1,
         elevation: 4,
         backgroundColor: "purple"
@@ -166,9 +176,10 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         borderColor: "gray",
         borderWidth: 1,
-        borderRadius: 2,
-        margin: 10,
-        padding: 10,
+        borderRadius: 10,
+        margin: 5,
+        marginRight: 10,
+        padding: 8,
         backgroundColor: "deepskyblue"
     },
 
@@ -176,9 +187,10 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         borderColor: "gray",
         borderWidth: 1,
-        borderRadius: 2,
-        margin: 10,
-        padding: 10,
+        borderRadius: 10,
+        margin: 5,
+        marginLeft: 10,
+        padding: 8,
         backgroundColor: "lightgray"
     }
 });

@@ -39,7 +39,7 @@ const SideMenuItems = (props) => {
                     [
                         {text: 'Cancel'},
                         {text: 'Yes', onPress: () => {
-                            props.signOut;
+                            props.signOut();
                         }},
                       
                     ],

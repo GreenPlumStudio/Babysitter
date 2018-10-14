@@ -1,7 +1,9 @@
 import React, { Component } from 'React';
-import { StyleSheet, Text, View, Dimensions, TextInput, Button, ScrollView, Keyboard } from 'react-native';
-import { firebase, firestore } from '../utils/firebase';
+import { StyleSheet, Text, View, Dimensions, TextInput, TouchableOpacity, ScrollView, Keyboard } from 'react-native';
+import { firestore } from '../utils/firebase';
 import { Constants } from 'expo';
+
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 const msgsPgHeight = Dimensions.get("window").height - Constants.statusBarHeight - 85;
 
@@ -50,11 +52,11 @@ export default class Messages extends Component {
     };
 
     componentDidMount() {
+        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
         setTimeout(() => {
             this.scrollToEnd();
         }, 500);
-        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
-        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
     };
 
     componentWillUnmount() {
@@ -98,9 +100,9 @@ export default class Messages extends Component {
 
     render() {
         return (
-            <View style={this.state.isEditingMsg ? styles.msgsPgViewOnEditing : styles.msgsPgView}>
-                <View style={{height: msgsPgHeight - 50, backgroundColor: "red"}}>
-                    <ScrollView ref={ msgsScrollView => { this.msgsScrollView = msgsScrollView } } /*contentContainerStyle={this.state.isEditingMsg ? styles.msgsScrollViewOnEditing : styles.msgsScrollView}*/>
+            <View style={styles.msgsPgView}>
+                <View style={{maxHeight: msgsPgHeight - 50, backgroundColor: "red"}}>
+                    <ScrollView ref={ msgsScrollView => { this.msgsScrollView = msgsScrollView } }>
                         {
                             this.state.msgs.map( (m, i) => {
                                 if (m.sentBy && this.props.accountType !== "babysitter" || !m.sentBy && this.props.accountType !== "parent") {
@@ -123,12 +125,17 @@ export default class Messages extends Component {
                 
                 { /* Send msg bar */ }
                 <View style={styles.sendMsgBar}>
-                    <TextInput underlineColorAndroid="transparent" style={{backgroundColor: "lightgray", flexGrow: 1}} placeholder="Type a message" value={this.state.textInput} onChangeText={ txt => this.setState({textInput: txt}) }/>
-                    <Button style={{width: 50, height: 50}} title={"Send"} onPress={() => {
+                    <TextInput underlineColorAndroid="transparent" style={{backgroundColor: "lightgray", flexBasis: 0, flexGrow: 1, paddingLeft: 7}} placeholder=" Type a message" value={this.state.textInput} onChangeText={ txt => this.setState({textInput: txt}) }/>
+                    <TouchableOpacity style={styles.button} onPress={() => {
                         this.setState({textInput: ""});
                         this.addMessage();
-                    }} />
+                    }}>
+                        <Text style={styles.buttonText}>Send</Text>
+                    </TouchableOpacity>
                 </View>
+                
+                { /* Imported from react-native-keyboard-spacer */ }
+                <KeyboardSpacer/>
             </View>
         );
     };
@@ -136,7 +143,6 @@ export default class Messages extends Component {
 
 const styles = StyleSheet.create({
     msgsPgView: {
-        height: msgsPgHeight,
         backgroundColor: "green",
         flex: 1
     },
@@ -148,30 +154,6 @@ const styles = StyleSheet.create({
         flex: 1
     },
 
-    msgsScrollView: {
-        height: msgsPgHeight - 50,
-        backgroundColor: "red"
-    },
-
-    msgsScrollViewOnEditing: {
-        height: msgsPgHeight - 150,
-        backgroundColor: "red"
-    },
-
-    sendMsgBar: {
-        flex: 1,
-        flexDirection: "row",
-        height: 50,
-        zIndex: 1,
-        elevation: 4,
-        backgroundColor: "purple"
-    },
-
-    container: {
-        alignItems: 'stretch',
-        zIndex: 10
-    },
-
     self: {
         alignSelf: "flex-end",
         borderColor: "gray",
@@ -179,6 +161,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 5,
         marginRight: 10,
+        marginLeft: 35,
         padding: 8,
         backgroundColor: "deepskyblue"
     },
@@ -190,7 +173,44 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 5,
         marginLeft: 10,
+        marginRight: 35,
         padding: 8,
         backgroundColor: "lightgray"
+    },
+
+    sendMsgBar: {
+        flex: 1,
+        flexDirection: "row",
+        height: 50,
+        zIndex: 1,
+        elevation: 4,
+        backgroundColor: "purple"
+    },
+
+    sendMsgBarOnEditing: {
+        flex: 1,
+        flexDirection: "row",
+        height: 50,
+        zIndex: 1,
+        elevation: 4,
+        backgroundColor: "purple",
+        marginBottom: Dimensions.get("window").height * 0.3
+    },
+
+    button: {
+        backgroundColor: "#2196F3",
+        borderRadius: 2,
+        elevation: 4,
+        height: 50,
+        width: 50,
+        justifyContent: "center"
+    },
+
+    buttonText: {
+        color: "white",
+        fontSize: 14,
+        fontWeight: "500",
+        padding: 8,
+        textAlign: "center"
     }
 });

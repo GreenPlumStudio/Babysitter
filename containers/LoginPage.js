@@ -31,9 +31,9 @@ export default class LoginPage extends Component {
                 </Text>
 
                 <View style={styles.loginForm}>
-                    <TextInput style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
                     
-                    <TextInput style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
                 </View>
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>

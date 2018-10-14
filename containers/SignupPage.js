@@ -76,17 +76,17 @@ export default class LoginPage extends Component {
                 </Text>
 
                 <ScrollView>
-                    <TextInput style={styles.formInput} placeholder="First Name" textContentType="givenName" value={this.state.firstName} onChangeText={text => this.setState({firstName: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="First Name" textContentType="givenName" value={this.state.firstName} onChangeText={text => this.setState({firstName: text})} />
 
-                    <TextInput style={styles.formInput} placeholder="Last Name" textContentType="familyName" value={this.state.lastName} onChangeText={text => this.setState({lastName: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Last Name" textContentType="familyName" value={this.state.lastName} onChangeText={text => this.setState({lastName: text})} />
                     
-                    <TextInput style={styles.formInput} placeholder="Username" textContentType="username" value={this.state.username} onChangeText={text => this.setState({username: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Username" textContentType="username" value={this.state.username} onChangeText={text => this.setState({username: text})} />
                     
-                    <TextInput style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Email" textContentType="emailAddress" keyboardType="email-address" value={this.state.emailAddress} onChangeText={text => this.setState({emailAddress: text})} />
                     
-                    <TextInput style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Password" textContentType="password" secureTextEntry={true} value={this.state.password} onChangeText={text => this.setState({password: text})} />
                     
-                    <TextInput style={styles.formInput} placeholder="Confirm Password" textContentType="password" secureTextEntry={true} value={this.state.confirmPassword} onChangeText={text => this.setState({confirmPassword: text})} />
+                    <TextInput underlineColorAndroid="transparent" style={styles.formInput} placeholder="Confirm Password" textContentType="password" secureTextEntry={true} value={this.state.confirmPassword} onChangeText={text => this.setState({confirmPassword: text})} />
                 </ScrollView>
 
                 <Text style={styles.errMsg}>{this.state.errMsg}</Text>

@@ -91,6 +91,7 @@ export default class App extends React.Component {
     this.switchCurOppositeUser = this.switchCurOppositeUser.bind(this);
     this.fetchMessages = this.fetchMessages.bind(this);
     this.fetchReminders = this.fetchReminders.bind(this);
+    this.fetchBabyInfo = this.fetchBabyInfo.bind(this);
 
     // SideMenu
     this.showSideMenu = this.showSideMenu.bind(this);
@@ -237,6 +238,13 @@ export default class App extends React.Component {
     let isAccountTypeParent = this.state.accountType === "parent";
     firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
       this.setState({reminders: doc.data().reminders});
+    });
+  };
+
+  fetchBabyInfo() {
+    let isAccountTypeParent = this.state.accountType === "parent";
+    firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
+      this.setState({info: doc.data().babyInfo});
     });
   };
 
@@ -516,6 +524,8 @@ export default class App extends React.Component {
   /* ~Side Menu */
 
   changeCurrentPage(newCurrentPage) {
+    if (newCurrentPage === "reminders") this.fetchReminders();
+    else if (newCurrentPage === "babyInfo") this.fetchBabyInfo();
     this.setState({currentPage: newCurrentPage});
   };
 

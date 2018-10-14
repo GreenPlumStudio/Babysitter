@@ -9,14 +9,14 @@ export default class Reminders extends Component {
         super(props);
 
         this.state = {
-            reminders: this.props.reminders
+            
         };
 
         this.deleteReminder = this.deleteReminder.bind(this);
     };
 
     deleteReminder(i) {
-        let ar = this.state.reminders;
+        let ar = this.props.reminders;
         ar.splice(i, 1);
 
         if (ar === null || ar === undefined) {
@@ -24,23 +24,23 @@ export default class Reminders extends Component {
         }
         else {this.setState({reminders: ar});}
 
-        this.props.deleteReminder(this.state.reminders);
+        this.props.deleteReminder(this.props.reminders);
     };
 
     render() {
         return (
             <View style={{height: Dimensions.get('window').height - Constants.statusBarHeight - 85}}>
                 {
-                    this.state.reminders.length == 0 &&
+                    this.props.reminders.length == 0 &&
                     <View style={{height: Dimensions.get("window").height - Constants.statusBarHeight - 85, justifyContent: "center", alignItems: "center"}}>
                         <Text style={{fontSize: 25, fontWeight: "400"}}>No current reminders!</Text>
                     </View>
                 }
                 {
-                    this.state.reminders &&
+                    this.props.reminders &&
                     <ScrollView contentContainerStyle={{padding: 10}}>
                         {
-                            this.state.reminders.map( (reminder, i) => 
+                            this.props.reminders.map( (reminder, i) => 
                                 <ReminderCell key={i} reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i} />
                             )
                         }

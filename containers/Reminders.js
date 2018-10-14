@@ -38,7 +38,7 @@ export default class Reminders extends Component {
                 }
                 {
                     this.props.reminders &&
-                    <ScrollView contentContainerStyle={{padding: 10}}>
+                    <ScrollView contentContainerStyle={{flexDirection: "column-reverse", padding: 10}}>
                         {
                             this.props.reminders.map( (reminder, i) => 
                                 <ReminderCell key={i} reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i} />

@@ -1,9 +1,9 @@
-import React, {Component} from 'React';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
-import {ReminderCell} from './ReminderCell';
-import {firebase, firestore} from '../utils/firebase';
+import React, { Component } from 'React';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import ReminderCell from './ReminderCell';
+import { firebase, firestore } from '../utils/firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Constants} from 'expo';
+import { Constants } from 'expo';
 
 export default class Reminders extends Component {
     constructor(props) {
@@ -26,42 +26,42 @@ export default class Reminders extends Component {
         else {this.setState({reminders: ar});}
 
         this.props.deleteReminder(this.state.reminders);
-    }
+    };
 
     render() {
         return (
-            <View style={{
-                height: Dimensions.get('window').height - Constants.statusBarHeight - 85
-            }}>
-                <Text>Reminders</Text>
-                
+            <View style={{height: Dimensions.get('window').height - Constants.statusBarHeight - 85}}>
                 {
                     this.state.reminders &&
-                    <View>{this.state.reminders.map( (reminder, i) => 
-                        <ReminderCell key={i} reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i}/>
-                    )}</View>
+                    <ScrollView contentContainerStyle={{padding: 10}}>
+                        {
+                            this.state.reminders.map( (reminder, i) => 
+                                <ReminderCell key={i} reminder={reminder} deleteReminder={this.deleteReminder.bind(this)} i={i} />
+                            )
+                        }
+                    </ScrollView>
                 }
-
                 {
                     this.props.accountType === "parent" &&
-
-                    <View
-                        style={{
-                            shadowOpacity: 0.5,
-                            position: "absolute",
-                            bottom: 22,
-                            right: 14,
-                            alignItems:'center',
-                            justifyContent:'center',
-                            width:65,
-                            height:65,
-                        }}
-                    >
-                        <Icon  name={"add-circle"} size={65} color="#01a699" onPress={() => this.props.popupDialog()} />
-                    </View>
+                    <TouchableOpacity style={styles.addReminderIcon} onPress={() => this.props.popupDialog()}>
+                        <Icon name={"add-circle"} size={55} color="#01a699" />
+                    </TouchableOpacity>
                 }
             </View>
         );
     };
-
 };
+
+const styles = StyleSheet.create({
+    addReminderIcon: {
+        position: "absolute",
+        bottom: 22,
+        right: 14,
+        alignItems: "center",
+        justifyContent: "center",
+        width: 65,
+        height: 65,
+        zIndex: 1,
+        elevation: 5
+    }
+});

@@ -59,12 +59,22 @@ export default class App extends React.Component {
 
 
       // babyInfo
-
       info: {},
 
       // messages:
-      msgs: []
+      msgs: [],
+      opacity: 0
     };
+
+    this.intervalID = setInterval( () => {
+      if (this.state.opacity > 1) {
+        clearInterval(this.intervalID);
+      }
+
+      this.setState({
+        opacity: this.state.opacity + 0.05
+      });
+    }, 1000/20);
 
     this.componentDidMount = this.componentDidMount.bind(this);
     this.changeAccountType = this.changeAccountType.bind(this);
@@ -153,7 +163,8 @@ export default class App extends React.Component {
                         textInput: ""
                     };
                 });
-                this.setState({msgs});   
+                this.setState({msgs});  
+                this.setState({opacity: 5}); 
               });
             })
           }
@@ -599,7 +610,7 @@ export default class App extends React.Component {
                 
                 {
                   hasOppositeUsers &&
-                  <NavBar currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
+                  <NavBar opacity={this.state.opacity} currentPage={this.state.currentPage} changeCurrentPage={this.changeCurrentPage} />
                 }
               </ImageBackground>
               {/* ~Top Menu Bar */}

@@ -7,8 +7,7 @@ export default class BabyInfo extends Component {
         super(props);
 
         this.state = {
-            user: this.props.user,
-            info: {},
+            info: this.props.info,
             currentPage: "home",
 
             // Input Info
@@ -21,80 +20,36 @@ export default class BabyInfo extends Component {
             dislikes: "",
             additionalInfo: "",
         };
-
-        this.all = firestore.collection("parentUsers").doc(this.props.accountType === "parent" ? this.props.user : this.props.oppositeUserUID)
-        .collection("babysitters").doc(this.props.accountType === "parent" ? this.props.oppositeUserUID : this.props.user);
-
-        this.editBabyInfo = this.editBabyInfo.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
     };
 
     componentDidMount() {
-        this.all.get().then(doc => {
-            let dataObj = doc.data().babyInfo;
+    
+        if (this.state.info.name!=undefined && this.state.info.name!=null) {
+            this.setState({name: this.state.info.name + ""});
+        }
 
-            this.setState({info: dataObj});
-
-            
-            if (this.state.info.name!=undefined && this.state.info.name!=null) {
-                this.setState({name: this.state.info.name + ""});
-            }
-
-            if (this.state.info.birthDate!=undefined && this.state.info.birthDate!=null) {
-                this.setState({birthDate: this.state.info.birthDate + ""});
-            }
-            if (this.state.info.allergies!=undefined && this.state.info.allergies!=null) {
-                this.setState({allergies: this.state.info.allergies + ""});
-            }
-            if (this.state.info.diseases!=undefined && this.state.info.diseases!=null) {
-                this.setState({diseases: this.state.info.diseases + ""});
-            }
-            if (this.state.info.other!=undefined && this.state.info.other!=null) {
-                this.setState({other: this.state.info.other + ""});
-            }
-            if (this.state.info.likes!=undefined && this.state.info.likes!=null) {
-                this.setState({likes: this.state.info.likes + ""});
-            }
-            if (this.state.info.dislikes!=undefined && this.state.info.dislikes!=null) {
-                this.setState({dislikes: this.state.info.dislikes + ""});
-            }
-            if (this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) {
-                this.setState({additionalInfo: this.state.info.additionalInfo + ""});
-            }
-        })
-    }
-
-    editBabyInfo() {
-
-        this.setState({
-            info: {
-                name: this.state.name,
-                birthDate: this.state.birthDate,
-                allergies: this.state.allergies,
-                diseases: this.state.diseases,
-                other: this.state.other,
-                likes: this.state.likes,
-                dislikes: this.state.dislikes,
-                additionalInfo: this.state.additionalInfo,
-            }
-        });
-
-        console.log(this.state.info);
-
-        this.all.update({
-            babyInfo: {
-                name: this.state.name,
-                birthDate: this.state.birthDate,
-                allergies: this.state.allergies,
-                diseases: this.state.diseases,
-                other: this.state.other,
-                likes: this.state.likes,
-                dislikes: this.state.dislikes,
-                additionalInfo: this.state.additionalInfo,
-            }
-        });
-
-
+        if (this.state.info.birthDate!=undefined && this.state.info.birthDate!=null) {
+            this.setState({birthDate: this.state.info.birthDate + ""});
+        }
+        if (this.state.info.allergies!=undefined && this.state.info.allergies!=null) {
+            this.setState({allergies: this.state.info.allergies + ""});
+        }
+        if (this.state.info.diseases!=undefined && this.state.info.diseases!=null) {
+            this.setState({diseases: this.state.info.diseases + ""});
+        }
+        if (this.state.info.other!=undefined && this.state.info.other!=null) {
+            this.setState({other: this.state.info.other + ""});
+        }
+        if (this.state.info.likes!=undefined && this.state.info.likes!=null) {
+            this.setState({likes: this.state.info.likes + ""});
+        }
+        if (this.state.info.dislikes!=undefined && this.state.info.dislikes!=null) {
+            this.setState({dislikes: this.state.info.dislikes + ""});
+        }
+        if (this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) {
+            this.setState({additionalInfo: this.state.info.additionalInfo + ""});
+        }
     }
 
     render() {
@@ -118,7 +73,7 @@ export default class BabyInfo extends Component {
 
                     {this.props.accountType === "parent" &&
                         <View>
-                            <Button title={"Add Baby Info"} onPress={() => {this.setState({currentPage: "edit"})}}/>
+                            <Button title={"Edit Baby Info"} onPress={() => {this.setState({currentPage: "edit"})}}/>
                         </View>
                     }
                 </View>
@@ -168,7 +123,8 @@ export default class BabyInfo extends Component {
                                     {text: 'Cancel'},
                                     {text: 'Yes', onPress: () => {
                                         this.setState({currentPage: "home"});
-                                        this.editBabyInfo();
+                                        this.props.editBabyInfo(this.state.name, this.state.birthDate, this.state.allergies,
+                                            this.state.diseases, this.state.other, this.state.likes, this.state.dislikes, this.state.additionalInfo);
                                     }},
                                   
                                 ],

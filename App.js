@@ -55,7 +55,12 @@ export default class App extends React.Component {
 
       // SideMenu
       percent: new Animated.Value(0),
-      grayout: false
+      grayout: false,
+
+
+      // babyInfo
+
+      info: {}
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -76,6 +81,9 @@ export default class App extends React.Component {
     // SideMenu
     this.showSideMenu = this.showSideMenu.bind(this);
     this.hideSideMenu = this.hideSideMenu.bind(this);
+
+    this.editBabyInfo = this.editBabyInfo.bind(this);
+    this.changeLoadingScreen = this.changeLoadingScreen.bind(this);
   };
 
   componentWillReceiveProps(newProps) {
@@ -116,9 +124,21 @@ export default class App extends React.Component {
                 // Fetch reminders
                 this.fetchReminders();
               }
-            }).catch( error => {
-              console.log("Parent user: error fetching connected babysitters collection:\n" + error);
-            });
+
+              // babyInfo
+
+              this.all = firestore.collection("parentUsers").doc(this.state.accountType === "parent" ? this.state.userUID : this.state.oppositeUserUID)
+              .collection("babysitters").doc(this.state.accountType === "parent" ? this.state.oppositeUserUID : this.state.userUID);
+
+              this.all.get().then(doc => {
+                let dataObj = doc.data().babyInfo;
+    
+                this.setState({info: dataObj});
+              })
+              .catch(err => {
+                console.log(err);
+              })
+            })
           }
           // if babysitter
           else {
@@ -151,9 +171,7 @@ export default class App extends React.Component {
                   // Fetch reminders
                   this.fetchReminders();
                 }
-              }).catch( error => {
-                console.log("Babysitter user: error fetching connected parents collection:\n" + error);
-              });
+              })
             });
           }
         });
@@ -165,16 +183,14 @@ export default class App extends React.Component {
 
     setTimeout(()=>{
       this.setState({isLoading: false});
-    }, 3000);
+    }, 4000);
   };
 
   fetchReminders() {
     let isAccountTypeParent = this.state.accountType === "parent";
     firestore.collection("parentUsers").doc(isAccountTypeParent ? this.state.userUID : this.state.oppositeUserUID).collection("babysitters").doc(isAccountTypeParent ? this.state.oppositeUserUID : this.state.userUID).get().then( doc => {
       this.setState({reminders: doc.data().reminders});
-    }).catch( error => {
-      console.log("Error fetching reminders:\n" + error);
-    });
+    })
   };
 
   changeAccountType(accountType) {
@@ -212,21 +228,6 @@ export default class App extends React.Component {
       this.setState({ reminders: nextProps });
     }
 
-    console.log(this.state.reminders);
-    console.log(this.state.userUID);
-    console.log(this.state.oppositeUserUID);
-
-    if (this.state.userUID == undefined) {
-      console.log("not working1 ");
-    } 
-    if (this.state.oppositeUserUID == undefined) {
-      console.log("not working2 ");
-    }
-
-    if (this.state.reminders == undefined) {
-      console.log("not working2 ");
-    }
-
     firestore.collection("parentUsers").doc(this.state.userUID).collection("babysitters").doc(this.state.oppositeUserUID).update({
       reminders: this.state.reminders
     });
@@ -253,6 +254,52 @@ export default class App extends React.Component {
         reminders: this.state.reminders
     });
   };
+
+  editBabyInfo(name, birthDate, allergies, diseases, other, likes, dislikes, additionalInfo) {
+
+    this.setState({isLoading: true});
+    let all = firestore.collection("parentUsers").doc(this.state.accountType === "parent" ? this.state.userUID : this.state.oppositeUserUID)
+    .collection("babysitters").doc(this.state.accountType === "parent" ? this.state.oppositeUserUID : this.state.userUID);
+
+    console.log(likes, dislikes);
+
+    this.setState({
+        info: {
+            name: name,
+            birthDate: birthDate,
+            allergies: allergies,
+            diseases: diseases,
+            other: other,
+            likes: likes,
+            dislikes: dislikes,
+            additionalInfo: additionalInfo,
+        }
+    });
+
+    all.update({
+        babyInfo: {
+            name: name,
+            birthDate: birthDate,
+            allergies: allergies,
+            diseases: diseases,
+            other: other,
+            likes: likes,
+            dislikes: dislikes,
+            additionalInfo: additionalInfo,
+        }
+    }).then(() => {
+      this.setState({currentPage: "messages"});
+      this.setState({currentPage: "babyInfo"});
+      this.setState({isLoading: false});
+    }).catch(err => {
+      this.setState({isLoading: false, errMsg: err});
+      alert("Could not update baby info. Please try again at a different time.");
+    })
+  }
+
+  changeLoadingScreen(bool) {
+    this.setState({isLoading: bool});
+  }
 
   addBabysitter(babysitterUsername) {
     // user is a parent
@@ -425,18 +472,12 @@ export default class App extends React.Component {
   };
 
   render() {
-    if (this.state.isLoading) {
-      return (
-        <View style={{flex: 1, justifyContent: "center", alignItems: "center", marginTop: Constants.statusBarHeight}}>
-          <Spinner visible={true} animation="fade" overlayColor="#2657a5" />
-        </View>
-      )
-    } else {
       let user = this.state.user;
       let isAccountTypeParent = this.state.accountType === "parent";
       let hasOppositeUsers = this.state.oppositeUsers.length > 0;
       
       return (
+        
         <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
           {
             !user && this.state.accountType === "" &&
@@ -545,7 +586,7 @@ export default class App extends React.Component {
                     }
                     {
                       this.state.currentPage === "babyInfo" &&
-                        <BabyInfo user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                        <BabyInfo info={this.state.info} editBabyInfo={this.editBabyInfo} accountType={this.state.accountType} />
                     }
                   </View>
                 </View>
@@ -577,10 +618,14 @@ export default class App extends React.Component {
 
             </View>
           }
+
+
+          <View style={{justifyContent: "center", alignItems: "center"}}>
+            <Spinner textContent={"Loading..."} textStyle={{color: '#FFF'}} visible={this.state.isLoading} animation="fade" overlayColor="#2657a5" />
+          </View>
         </View>
       );
     };
-  }
 };
 
 const styles = StyleSheet.create({

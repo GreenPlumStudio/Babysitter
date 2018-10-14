@@ -40,7 +40,7 @@ export default class App extends React.Component {
       // loading: true,
       accountType: "",
       loginOrSignup: "login",
-      currentPage: "",
+      currentPage: "messages",
       parentUsername: "",
       parentUID: "",
       babysitterUsername: "",
@@ -155,8 +155,6 @@ export default class App extends React.Component {
                 });
                 this.setState({msgs});   
               });
-
-              this.setState({currentPage: "messages"});
             })
           }
           // if babysitter
@@ -190,6 +188,34 @@ export default class App extends React.Component {
                   // Fetch reminders
                   this.fetchReminders();
                 }
+
+                // babyInfo
+  
+                this.all = firestore.collection("parentUsers").doc(this.state.accountType === "parent" ? this.state.userUID : this.state.oppositeUserUID)
+                .collection("babysitters").doc(this.state.accountType === "parent" ? this.state.oppositeUserUID : this.state.userUID);
+  
+                this.all.get().then(doc => {
+                  let dataObj = doc.data().babyInfo;
+      
+                  this.setState({info: dataObj});
+                })
+                .catch(err => {
+                  console.log(err);
+                })
+  
+                this.all.onSnapshot( doc => {
+                  let dataObj = doc.data().messages;
+                  
+                  let msgs = dataObj.map( key => {
+                      return {
+                          sentBy: key.sentBy,
+                          text: key.text,
+                          time: key.time,
+                          textInput: ""
+                      };
+                  });
+                  this.setState({msgs});   
+                });
               })
             });
           }

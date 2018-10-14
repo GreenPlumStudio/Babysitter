@@ -4,8 +4,6 @@ import {ReminderCell} from './ReminderCell';
 import {firebase, firestore} from '../utils/firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Constants} from 'expo';
-import ElevatedView from 'react-native-elevated-view';
-
 export default class Reminders extends Component {
     constructor(props) {
         super(props);
@@ -48,7 +46,6 @@ export default class Reminders extends Component {
 
                     <View
                         style={{
-                            shadowOpacity: 0.5,
                             position: "absolute",
                             bottom: 22,
                             right: 14,

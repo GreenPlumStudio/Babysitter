@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         elevation: 3,
         zIndex: 0,
-        top: 55
+        top: 55,
+        opacity: this.props.opacity
     },
   
     navButton: {

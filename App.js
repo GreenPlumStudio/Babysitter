@@ -533,21 +533,19 @@ export default class App extends React.Component {
 
               {
                 hasOppositeUsers &&
-                <View style={{flex: 1, zIndex: 0}}>
-                  <View>
-                    {
-                      this.state.currentPage === "messages" &&
-                      <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
-                    }
-                    {
-                      this.state.currentPage === "reminders" &&
-                      <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
-                    }
-                    {
-                      this.state.currentPage === "babyInfo" &&
-                        <BabyInfo user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
-                    }
-                  </View>
+                <View style={{zIndex: 0}}>
+                  {
+                    this.state.currentPage === "messages" &&
+                    <Messages user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                  }
+                  {
+                    this.state.currentPage === "reminders" &&
+                    <Reminders reminders={this.state.reminders} popupDialog={this.openAddReminderPopup} deleteReminder={this.deleteReminder} accountType={this.state.accountType} />
+                  }
+                  {
+                    this.state.currentPage === "babyInfo" &&
+                      <BabyInfo user={this.state.userUID} accountType={this.state.accountType} oppositeUserUID={this.state.oppositeUserUID} />
+                  }
                 </View>
               }
 

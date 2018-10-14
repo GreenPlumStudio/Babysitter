@@ -63,7 +63,6 @@ export default class LoginPage extends Component {
                 });
             })
             .catch(error => {
-                console.log("Error creating user w/ email/password:\n" + error);
                 this.setState({errMsg: error.message});
             });
         });

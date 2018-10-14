@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 
 const SideMenuItems = (props) => {
     return (
@@ -32,7 +32,19 @@ const SideMenuItems = (props) => {
                 </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.button} onPress={props.signOut}>
+            <TouchableOpacity style={styles.button} onPress={ () => {
+                Alert.alert(
+                    'Confirmation',
+                    'Are you sure you want to sign out?',
+                    [
+                        {text: 'Cancel'},
+                        {text: 'Yes', onPress: () => {
+                            props.signOut;
+                        }},
+                      
+                    ],
+                )
+            }}>
                 <Text style={styles.buttonText}>
                     SIGN OUT
                 </Text>

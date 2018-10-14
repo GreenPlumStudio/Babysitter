@@ -114,7 +114,7 @@ export default class BabyInfo extends Component {
                         <Text>Additional Information: </Text><TextInput value={this.state.additionalInfo} onChangeText={(a) => {this.setState({additionalInfo: a})}}/>
                         <Button title={"X"} onPress={() => {this.setState({additionalInfo: ""})}} />
 
-
+                        
                         <Button title={"Save Changes"} onPress={() => {
                             Alert.alert(
                                 'Confirmation',

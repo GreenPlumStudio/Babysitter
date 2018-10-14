@@ -1,7 +1,10 @@
 import React, {Component} from 'React';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import {ReminderCell} from './ReminderCell';
 import {firebase, firestore} from '../utils/firebase';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Constants} from 'expo';
+import ElevatedView from 'react-native-elevated-view';
 
 export default class Reminders extends Component {
     constructor(props) {
@@ -28,7 +31,9 @@ export default class Reminders extends Component {
 
     render() {
         return (
-            <View>
+            <View style={{
+                height: Dimensions.get('window').height - Constants.statusBarHeight - 85
+            }}>
                 <Text>Reminders</Text>
                 
                 {
@@ -40,7 +45,21 @@ export default class Reminders extends Component {
 
                 {
                     this.props.accountType === "parent" &&
-                    <Button title="Add a Reminder" onPress={this.props.popupDialog} />
+
+                    <View
+                        style={{
+                            shadowOpacity: 0.5,
+                            position: "absolute",
+                            bottom: 22,
+                            right: 14,
+                            alignItems:'center',
+                            justifyContent:'center',
+                            width:65,
+                            height:65,
+                        }}
+                    >
+                        <Icon  name={"add-circle"} size={65} color="#01a699" onPress={() => this.props.popupDialog()} />
+                    </View>
                 }
             </View>
         );

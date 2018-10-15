@@ -1,6 +1,9 @@
-import React, {Component} from 'React';
-import { StyleSheet, Text, View, Button, TextInput, ScrollView, Alert} from 'react-native';
-import {firebase, firestore} from '../utils/firebase';
+import React, { Component } from 'React';
+import { StyleSheet, Text, View, Button, TouchableOpacity, TextInput, ScrollView, Alert, Dimensions } from 'react-native';
+// import { firebase, firestore } from '../utils/firebase';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import FeatherIcon from 'react-native-vector-icons/Feather';
+import { Constants } from 'expo';
 
 export default class BabyInfo extends Component {
     constructor(props) {
@@ -18,7 +21,7 @@ export default class BabyInfo extends Component {
             other: "",
             likes: "",
             dislikes: "",
-            additionalInfo: "",
+            additionalInfo: ""
         };
         this.componentDidMount = this.componentDidMount.bind(this);
     };
@@ -55,34 +58,59 @@ export default class BabyInfo extends Component {
     render() {
         if (this.state.currentPage==="home") {
             return (
-                <View>
-                    <Text>Baby Name: {(this.state.info.name!=undefined && this.state.info.name!=null) && <Text>{this.state.info.name}</Text>}</Text>
-                    <Text>Date of Birth: {(this.state.info.birthDate!=undefined && this.state.info.birthDate!=null) && <Text>{this.state.info.birthDate}</Text>}</Text>
-                    
-                    <Text>------------</Text>
+                <View style={{flex: 1}}>
+                    <View style={{flex: 1, backgroundColor: "#f5f5f5"}}>
+                        <Text style={styles.infoCategoryLabel}>GENERAL INFO</Text>
 
-                    <Text>Allergies: {(this.state.info.allergies!=undefined && this.state.info.allergies!=null) && <Text>{this.state.info.allergies}</Text>}</Text>
-                    <Text>Diseases: {(this.state.info.diseases!=undefined && this.state.info.diseases!=null) && <Text>{this.state.info.diseases}</Text>}</Text>
-                    <Text>Other: {(this.state.info.other!=undefined && this.state.info.other!=null) && <Text>{this.state.info.other}</Text>}</Text>
-
-                    <Text>------------</Text>
-
-                    <Text>Likes: {(this.state.info.likes!=undefined && this.state.info.likes!=null) && <Text>{this.state.info.likes}</Text>}</Text>
-                    <Text>Dislikes: {(this.state.info.dislikes!=undefined && this.state.info.dislikes!=null) && <Text>{this.state.info.dislikes}</Text>}</Text>
-                    <Text>Additional Information: {(this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) && <Text>{this.state.info.additionalInfo}</Text>}</Text>
-
-                    {this.props.accountType === "parent" &&
-                        <View>
-                            <Button title={"Edit Baby Info"} onPress={() => {this.setState({currentPage: "edit"})}}/>
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Baby's Name: {(this.state.info.name!=undefined && this.state.info.name!=null) && <Text style={styles.infoDetail}>{this.state.info.name}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Date of Birth: {(this.state.info.birthDate!=undefined && this.state.info.birthDate!=null) && <Text style={styles.infoDetail}>{this.state.info.birthDate}</Text>}</Text>
                         </View>
+                        
+                        <Text style={styles.infoCategoryLabel}>MEDICAL INFO</Text>
+
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Allergies: {(this.state.info.allergies!=undefined && this.state.info.allergies!=null) && <Text style={styles.infoDetail}>{this.state.info.allergies}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Diseases: {(this.state.info.diseases!=undefined && this.state.info.diseases!=null) && <Text style={styles.infoDetail}>{this.state.info.diseases}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Other: {(this.state.info.other!=undefined && this.state.info.other!=null) && <Text style={styles.infoDetail}>{this.state.info.other}</Text>}</Text>
+                        </View>
+
+                        <Text style={styles.infoCategoryLabel}>PERSONAL INFO</Text>
+
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Likes: {(this.state.info.likes!=undefined && this.state.info.likes!=null) && <Text style={styles.infoDetail}>{this.state.info.likes}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Dislikes: {(this.state.info.dislikes!=undefined && this.state.info.dislikes!=null) && <Text style={styles.infoDetail}>{this.state.info.dislikes}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Additional Information: {(this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) && <Text style={styles.infoDetail}>{this.state.info.additionalInfo}</Text>}</Text>
+                        </View>
+                    </View>
+
+                    {
+                        this.props.accountType === "parent" &&
+                        <TouchableOpacity style={styles.icons} onPress={() => { this.setState({currentPage: "edit"}) }}>
+                            <Icon name={"edit"} style={{
+                                position: "absolute",
+                                elevation: 13
+                            }} size={28} color="white" />
+
+                            <View style={{
+                                backgroundColor: "cornflowerblue",
+                                borderRadius: 27.5,
+                                elevation: 6,
+                                width: 50,
+                                height: 50,
+                                position: "absolute",
+                                zIndex: 1,
+                                overflow: "visible"
+                            }} />
+                        </TouchableOpacity>
                     }
                 </View>
             );
         }
         else {
             return (
-                    <ScrollView>
-                    <View>
+                <View style={{minHeight: Dimensions.get('window').height - Constants.statusBarHeight - 85}}>
+                    <ScrollView contentContainerStyle={{backgroundColor:"blue"}}>
                         <Button title={"Back to Baby Info"} onPress={() => {this.setState({currentPage: "home"})}}/>
                         <Text>Edit</Text>
 
@@ -113,26 +141,106 @@ export default class BabyInfo extends Component {
 
                         <Text>Additional Information: </Text><TextInput value={this.state.additionalInfo} onChangeText={(a) => {this.setState({additionalInfo: a})}}/>
                         <Button title={"X"} onPress={() => {this.setState({additionalInfo: ""})}} />
+                    </ScrollView>
 
-                        
-                        <Button title={"Save Changes"} onPress={() => {
-                            Alert.alert(
-                                'Confirmation',
-                                'Are you sure you want to save your changes?',
-                                [
-                                    {text: 'Cancel'},
-                                    {text: 'Yes', onPress: () => {
-                                        this.setState({currentPage: "home"});
-                                        this.props.editBabyInfo(this.state.name, this.state.birthDate, this.state.allergies,
-                                            this.state.diseases, this.state.other, this.state.likes, this.state.dislikes, this.state.additionalInfo);
-                                    }},
-                                  
-                                ],
-                            )
+                    <TouchableOpacity style={[styles.icons, {right: 79}]} onPress={() => {
+                        Alert.alert(
+                            'Confirm Cancel',
+                            'Are you sure you want to discard your changes?',
+                            [
+                                {text: 'Go Back'},
+                                {text: 'Yes, Discard Changes', onPress: () => {
+                                    this.setState({currentPage: "home"});
+                                }},
+                            ],
+                        )
+                    }}>
+                        <FeatherIcon name={"x"} style={{
+                            position: "absolute",
+                            elevation: 13
+                        }} size={28} color="white" />
+
+                        <View style={{
+                            backgroundColor: "red",
+                            borderRadius: 27.5,
+                            elevation: 6,
+                            width: 50,
+                            height: 50,
+                            position: "absolute",
+                            zIndex: 1,
+                            overflow: "visible"
                         }} />
-                    </View>
-                </ScrollView>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={styles.icons} onPress={() => {
+                        Alert.alert(
+                            'Confirm Changes',
+                            'Are you sure you want to save your changes?',
+                            [
+                                {text: 'Cancel'},
+                                {text: 'Yes', onPress: () => {
+                                    this.setState({currentPage: "home"});
+                                    this.props.editBabyInfo(this.state.name, this.state.birthDate, this.state.allergies,
+                                        this.state.diseases, this.state.other, this.state.likes, this.state.dislikes, this.state.additionalInfo);
+                                }},
+                            ],
+                        )
+                    }}>
+                        <Icon name={"check"} style={{
+                            position: "absolute",
+                            elevation: 13
+                        }} size={28} color="white" />
+
+                        <View style={{
+                            backgroundColor: "green",
+                            borderRadius: 27.5,
+                            elevation: 6,
+                            width: 50,
+                            height: 50,
+                            position: "absolute",
+                            zIndex: 1,
+                            overflow: "visible"
+                        }} />
+                    </TouchableOpacity>
+                </View>
             )
         }
     };
 };
+
+const styles = StyleSheet.create({
+    infoCategoryLabel: {
+        marginLeft: 10,
+        marginTop: 18,
+        marginBottom: 5,
+        fontSize: 12,
+        fontWeight: "300"
+    },
+
+    infoCategoryView: {
+        width: Dimensions.get("window").width,
+        backgroundColor: "white",
+        elevation: 1,
+        padding: 10
+    },
+
+    infoDetailLabel: {
+        fontSize: 18,
+        fontWeight: "500"
+    },
+
+    infoDetail: {
+        fontSize: 15
+    },
+
+    icons: {
+        position: "absolute",
+        bottom: 15,
+        right: 9,
+        alignItems: "center",
+        justifyContent: "center",
+        width: 70,
+        height: 70,
+        zIndex: 1
+    }
+});

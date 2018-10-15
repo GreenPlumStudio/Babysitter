@@ -5,6 +5,7 @@ import { Constants } from 'expo';
 
 import PopupDialog, { ScaleAnimation, DialogButton, DialogTitle} from 'react-native-popup-dialog';
 import Spinner from 'react-native-loading-spinner-overlay';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
@@ -35,7 +36,7 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      color: 'cyan',
+      color: '#f2f2f2',
       isLoading: true,
       user: undefined,
       userUID: "",
@@ -624,8 +625,8 @@ export default class App extends React.Component {
                     }
                   </Text>
 
-                  <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} onPress={() => this.setState({currentPage: "settings"})}>
-                    <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require("./assets/antMenuIcon.png")} />
+                  <TouchableOpacity style={{position: "absolute", top: 15, right: 15}} onPress={() => this.setState({currentPage: "settings"})}>
+                    <MaterialIcon name="settings" size={28} color="#B1B1B6" />
                   </TouchableOpacity>
                 </View>
                 

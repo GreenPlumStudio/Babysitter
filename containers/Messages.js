@@ -112,7 +112,7 @@ export default class Messages extends Component {
                     <View style={styles.sendMsgBar}>
                         <TextInput
                             underlineColorAndroid="transparent"
-                            style={{ backgroundColor: 'lightgray', flexBasis: 0, flexGrow: 1, paddingLeft: 7 }}
+                            style={{ backgroundColor: '#e8e8e8', flexBasis: 0, flexGrow: 1, paddingLeft: 7 }}
                             placeholder=" Type a message"
                             value={this.state.textInput}
                             onChangeText={(txt) => this.setState({ textInput: txt })}
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
 		height: 50,
 		zIndex: 1,
 		elevation: 4,
-		backgroundColor: 'purple'
+		marginTop: 5
 	},
 
 	sendMsgBarOnEditing: {
@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
 		height: 50,
 		zIndex: 1,
 		elevation: 4,
-		backgroundColor: 'purple',
 		marginBottom: Dimensions.get('window').height * 0.3
 	},
 

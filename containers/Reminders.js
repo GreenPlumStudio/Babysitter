@@ -55,12 +55,8 @@ export default class Reminders extends Component {
                         }} size={28} color="white" />
 
                         <View style={{
-                            backgroundColor: "red",
+                            backgroundColor: "cornflowerblue",
                             borderRadius: 27.5,
-                            // shadowOpacity: 1,
-                            // shadowRadius: 10,
-                            // shadowOffset: {width: 10,height: 10},
-                            // shadowColor: "gray",
                             elevation: 6,
                             width: 50,
                             height: 50,

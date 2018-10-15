@@ -59,7 +59,7 @@ export default class BabyInfo extends Component {
         if (this.state.currentPage==="home") {
             return (
                 <View style={{flex: 1}}>
-                    <View style={{flex: 1, backgroundColor: "#f5f5f5"}}>
+                    <View style={{flex: 1}}>
                         <Text style={styles.infoCategoryLabel}>GENERAL INFO</Text>
 
                         <View style={styles.infoCategoryView}>
@@ -80,7 +80,7 @@ export default class BabyInfo extends Component {
                         <View style={styles.infoCategoryView}>
                             <Text style={styles.infoDetailLabel}>Likes: {(this.state.info.likes!=undefined && this.state.info.likes!=null) && <Text style={styles.infoDetail}>{this.state.info.likes}</Text>}</Text>
                             <Text style={styles.infoDetailLabel}>Dislikes: {(this.state.info.dislikes!=undefined && this.state.info.dislikes!=null) && <Text style={styles.infoDetail}>{this.state.info.dislikes}</Text>}</Text>
-                            <Text style={styles.infoDetailLabel}>Additional Information: {(this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) && <Text style={styles.infoDetail}>{this.state.info.additionalInfo}</Text>}</Text>
+                            <Text style={styles.infoDetailLabel}>Additional Info: {(this.state.info.additionalInfo!=undefined && this.state.info.additionalInfo!=null) && <Text style={styles.infoDetail}>{this.state.info.additionalInfo}</Text>}</Text>
                         </View>
                     </View>
 
@@ -109,38 +109,71 @@ export default class BabyInfo extends Component {
         }
         else {
             return (
-                <View style={{minHeight: Dimensions.get('window').height - Constants.statusBarHeight - 85}}>
-                    <ScrollView contentContainerStyle={{backgroundColor:"blue"}}>
-                        <Button title={"Back to Baby Info"} onPress={() => {this.setState({currentPage: "home"})}}/>
-                        <Text>Edit</Text>
+                <View style={{flex: 1}}>
+                    <ScrollView>
+                        <Text style={{fontSize: 20, fontWeight: "500", marginTop: 10, marginLeft: 10}}>Edit Baby Info:</Text>
 
-                        <Text>Name: </Text><TextInput value={this.state.name} onChangeText={(a) => {this.setState({name: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({name: ""})}} />
-                        
-                        <Text>Birth Date: </Text><TextInput value={this.state.birthDate} onChangeText={(a) => {this.setState({birthDate: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({birthDate: ""})}} />
+                        <Text style={[styles.infoCategoryLabel, {marginTop: 12}]}>GENERAL INFO</Text>
 
-                        <Text>------------</Text>
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Baby's Name:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.name} onChangeText={(a) => {this.setState({name: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({name: ""})}} />
+                            </View>
+                            
+                            <Text style={styles.infoDetailLabel}>Date of Birth:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.birthDate} onChangeText={(a) => {this.setState({birthDate: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({birthDate: ""})}} />
+                            </View>
+                        </View>
 
-                        <Text>Allergies: </Text><TextInput value={this.state.allergies} onChangeText={(a) => {this.setState({allergies: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({allergies: ""})}} />
+                        <Text style={styles.infoCategoryLabel}>MEDICAL INFO</Text>
 
-                        <Text>Diseases: </Text><TextInput value={this.state.diseases} onChangeText={(a) => {this.setState({diseases: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({diseases: ""})}} />
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Allergies:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.allergies} onChangeText={(a) => {this.setState({allergies: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({allergies: ""})}} />
+                            </View>
 
-                        <Text>Other: </Text><TextInput value={this.state.other} onChangeText={(a) => {this.setState({other: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({other: ""})}} />
+                            <Text style={styles.infoDetailLabel}>Diseases:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.diseases} onChangeText={(a) => {this.setState({diseases: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({diseases: ""})}} />
+                            </View>
 
-                        <Text>------------</Text>
+                            <Text style={styles.infoDetailLabel}>Other:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.other} onChangeText={(a) => {this.setState({other: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({other: ""})}} />
+                            </View>
+                        </View>
 
-                        <Text>Likes: </Text><TextInput value={this.state.likes} onChangeText={(a) => {this.setState({likes: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({likes: ""})}} />
+                        <Text style={styles.infoCategoryLabel}>PERSONAL INFO</Text>
 
-                        <Text>Dislikes: </Text><TextInput value={this.state.dislikes} onChangeText={(a) => {this.setState({dislikes: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({dislikes: ""})}} />
+                        <View style={styles.infoCategoryView}>
+                            <Text style={styles.infoDetailLabel}>Likes:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.likes} onChangeText={(a) => {this.setState({likes: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({likes: ""})}} />
+                            </View>
 
-                        <Text>Additional Information: </Text><TextInput value={this.state.additionalInfo} onChangeText={(a) => {this.setState({additionalInfo: a})}}/>
-                        <Button title={"X"} onPress={() => {this.setState({additionalInfo: ""})}} />
+                            <Text style={styles.infoDetailLabel}>Dislikes:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.dislikes} onChangeText={(a) => {this.setState({dislikes: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({dislikes: ""})}} />
+                            </View>
+
+                            <Text style={styles.infoDetailLabel}>Additional Info:</Text>
+                            <View style={styles.infoDetailView}>
+                                <TextInput style={styles.infoDetailInput} multiline value={this.state.additionalInfo} onChangeText={(a) => {this.setState({additionalInfo: a})}}/>
+                                <Button title={"X"} onPress={() => {this.setState({additionalInfo: ""})}} />
+                            </View>
+                        </View>
+
+                        <View style={{left: 0, right: 0, bottom: 0, height: 95}} />
                     </ScrollView>
 
                     <TouchableOpacity style={[styles.icons, {right: 79}]} onPress={() => {
@@ -231,6 +264,16 @@ const styles = StyleSheet.create({
 
     infoDetail: {
         fontSize: 15
+    },
+
+    infoDetailView: {
+        flex: 1,
+        flexDirection: "row"
+    },
+
+    infoDetailInput: {
+        width: Dimensions.get("window").width - 53,
+        marginRight: 7
     },
 
     icons: {

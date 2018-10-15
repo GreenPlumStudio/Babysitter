@@ -9,6 +9,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Messages from './containers/Messages';
 import Reminders from './containers/Reminders';
 import BabyInfo from './containers/BabyInfo';
+import Settings from './containers/Settings';
 import WelcomePage from './components/WelcomePage';
 import LoginSignupPage from './containers/LoginSignupPage';
 import NavBar from './components/NavBar';
@@ -34,6 +35,7 @@ export default class App extends React.Component {
     super();
 
     this.state = {
+      color: 'cyan',
       isLoading: true,
       user: undefined,
       userUID: "",
@@ -92,6 +94,7 @@ export default class App extends React.Component {
     this.fetchMessages = this.fetchMessages.bind(this);
     this.fetchReminders = this.fetchReminders.bind(this);
     this.fetchBabyInfo = this.fetchBabyInfo.bind(this);
+    this.changeBackgroundColor = this.changeBackgroundColor.bind(this);
 
     // SideMenu
     this.showSideMenu = this.showSideMenu.bind(this);
@@ -110,8 +113,9 @@ export default class App extends React.Component {
       if (user) {
         firestore.collection("parentUsers").doc(user.uid).get().then( parentUserDoc => {
           // if parent
+
           if (parentUserDoc.data()) {
-            this.setState({user: parentUserDoc.data(), userUID: user.uid, accountType: "parent"});
+            this.setState({user: parentUserDoc.data(), color: parentUserDoc.data().color, userUID: user.uid, accountType: "parent"});
 
             firestore.collection("parentUsers").doc(user.uid).collection("babysitters").get().then( col => {
               let oppositeUsers = new Array(col.size-1);
@@ -356,6 +360,21 @@ export default class App extends React.Component {
     this.setState({isLoading: bool});
   }
 
+  changeBackgroundColor(colora) {
+    console.log(this.state.userUID);
+
+
+    let a = (this.state.accountType=="parent") ? "parentUsers" : "babysitterUsers"
+    firestore.collection(a).doc(this.state.userUID).update({
+      "color": colora
+    }).then( () => {
+      this.setState({color: colora});
+      alert("Background Successfully Changed!");
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
   addBabysitter(babysitterUsername) {
     // user is a parent
     firestore.collection("babysitterUsernameToUID").get().then( col => {
@@ -536,7 +555,7 @@ export default class App extends React.Component {
       
       return (
         
-        <View style={{flex:1, backgroundColor: "lightpink", marginTop: Constants.statusBarHeight}}>
+        <View style={{flex:1, backgroundColor: this.state.color, marginTop: Constants.statusBarHeight}}>
           {
             !user && this.state.accountType === "" &&
               <WelcomePage changeAccountType={this.changeAccountType} />
@@ -605,7 +624,7 @@ export default class App extends React.Component {
                     }
                   </Text>
 
-                  <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} /*onPress={this.showInfoMenu}*/>
+                  <TouchableOpacity style={{position: "absolute", top: 20, right: 0}} onPress={() => this.setState({currentPage: "settings"})}>
                     <Image style={{resizeMode: "contain", maxHeight: 20, right: -20}} source={require("./assets/antMenuIcon.png")} />
                   </TouchableOpacity>
                 </View>
@@ -645,11 +664,15 @@ export default class App extends React.Component {
                     this.state.currentPage === "babyInfo" &&
                     <BabyInfo info={this.state.info} editBabyInfo={this.editBabyInfo} accountType={this.state.accountType} />
                   }
+                  {
+                    this.state.currentPage === "settings" &&
+                    <Settings user={this.state.user} checked={this.state.color} changeBackgroundColor={this.changeBackgroundColor}/>
+                  }
                 </View>
               }
 
               <PopupDialog
-                overlayBackgroundColor={"lightblue"}
+                overlayBackgroundColor={this.state.color}
                 height={0.6}
                 dialogAnimation={addBabysitterPopup}
                 ref={(popupDialog) => { this.addBabysitterPopupDialog = popupDialog; }}
@@ -661,7 +684,7 @@ export default class App extends React.Component {
               </PopupDialog>
 
               <PopupDialog
-                overlayBackgroundColor={"lightblue"}
+                overlayBackgroundColor={this.state.color}
                 height={0.6}
                 dialogAnimation={addReminderPopup}
                 ref={(popupDialog) => { this.addReminderPopupDialog = popupDialog; }}

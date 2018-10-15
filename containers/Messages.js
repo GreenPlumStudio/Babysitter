@@ -136,7 +136,6 @@ export default class Messages extends Component {
 
 const styles = StyleSheet.create({
 	msgsPgView: {
-		backgroundColor: 'green',
 		flex: 1
 	},
 

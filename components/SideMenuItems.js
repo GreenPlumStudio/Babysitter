@@ -6,7 +6,7 @@ const SideMenuItems = (props) => {
         <ScrollView contentContainerStyle={{flex: 1, alignItems: "center", padding: 15}}>
             <Image style={styles.topBarImage} source={require("../assets/sideMenuTopBar.png")} />
             <TouchableOpacity>
-                <Image style={styles.userIcon} resizeMode="center" source={require("../assets/defaultUserIcon.png")} />
+                <Image style={styles.userIcon} resizeMode="center" source={props.accountType === "parent" ? require("../assets/tempLee.png") : require("../assets/tempAndrew.png")} />
             </TouchableOpacity>
 
             <View style={{marginBottom: 10}}>
@@ -18,9 +18,19 @@ const SideMenuItems = (props) => {
             <View>
                 {
                     props.oppositeUsers.map( oppositeUser => (
-                        <TouchableOpacity style={{width: props.sideMenuWidth - 30, marginBottom: 5}} key={oppositeUser.username} onPress={() => props.switchCurOppositeUser(oppositeUser.username)}>
-                            <Text style={{fontSize: 15, fontWeight: "400"}}>{ oppositeUser.firstName + " " + oppositeUser.lastName }</Text>
-                            <Text>{ oppositeUser.username + "   |   " + oppositeUser.email }</Text>
+                        <TouchableOpacity style={{width: props.sideMenuWidth - 30, marginBottom: 5, flexDirection: "row", alignItems: "center"}} key={oppositeUser.username} onPress={() => props.switchCurOppositeUser(oppositeUser.username)}>
+                            {
+                                props.accountType === "parent" &&
+                                <Image style={styles.oppositeUserImgs} resizeMode="center" source={oppositeUser.username === "drummerSkyler20" ? require("../assets/tempAndrew.png") : require("../assets/tempShane.png")} />
+                            }
+                            {
+                                props.accountType === "babysitter" &&
+                                <Image style={styles.oppositeUserImgs} resizeMode="center" source={oppositeUser.username === "leeTeacher" ? require("../assets/tempLee.png") : require("../assets/tempEden.png")} />
+                            }
+                            <View>
+                                <Text style={{fontSize: 15, fontWeight: "400"}}>{ oppositeUser.firstName + " " + oppositeUser.lastName }</Text>
+                                <Text>{ oppositeUser.username + "   |   " + oppositeUser.email }</Text>
+                            </View>
                         </TouchableOpacity>
                     ))
                 }
@@ -54,6 +64,12 @@ const SideMenuItems = (props) => {
 };
 
 const styles = StyleSheet.create({
+    oppositeUserImgs: {
+        width: 50,
+        height: 50,
+        marginRight: 10
+    },
+
     topBarImage: {
         position: "absolute",
         height: 70

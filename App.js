@@ -640,10 +640,14 @@ export default class App extends React.Component {
               {
                 !hasOppositeUsers &&
                 <View style={{zIndex: 0}}>
-                  <View>
-                    <Text>To start, please add a {isAccountTypeParent ? "Babysitter" : "Parent"}</Text>
+                  <View style={{padding: 10}}>
+                    <Text style={{fontSize: 20}}>To start, please add a {isAccountTypeParent ? "Babysitter:" : "Parent:"}</Text>
 
-                    <TextInput placeholder={(isAccountTypeParent ? "Babysitter" : "Parent") + " Username"} style={{zIndex: 1}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
+                    <View style={{flexDirection: "row", alignItems: "center", height: 30}}>
+                      <Text>Username: </Text>
+                      <TextInput placeholder={(isAccountTypeParent ? " Babysitter" : " Parent") + " Username"} style={{zIndex: 1, width: 300, alignSelf: "flex-end"}} value={isAccountTypeParent ? this.state.babysitterUsername : this.state.parentUsername} onChangeText={isAccountTypeParent ? text => this.setState({babysitterUsername: text}) : text => this.setState({parentUsername: text})}/>
+                    </View>
+
                     <Text>{this.state.errMsg}</Text>
                     <Button style={{zIndex: 1}} title={isAccountTypeParent ? "Add Babysitter" : "Add Parent"} onPress={isAccountTypeParent ? () => {this.addBabysitter(this.state.babysitterUsername)} : () => {this.addParent(this.state.parentUsername)}} />
                   </View>
